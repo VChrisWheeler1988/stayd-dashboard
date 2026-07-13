@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STAYD — 30/60/90 by Seat</title>
+<style>
+  :root{
+    --navy:#0F2338; --navy-2:#1B3A57; --teal:#12A594; --teal-dk:#0B7A6D;
+    --slate:#5A6B7B; --slate-lt:#8A9AA8; --line:#DDE4EA; --bg:#F4F7F9; --card:#FFFFFF;
+    --amber:#D98C21; --red:#C0453B; --green:#2E8B57; --radius:6px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--navy);
+    font-family:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.45}
+  header{background:var(--navy);color:#fff;padding:22px 28px 18px;border-bottom:4px solid var(--teal)}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{margin:0;font-size:22px;letter-spacing:.4px;font-weight:600}
+  h1 a{color:#7FD8CB;text-decoration:none;font-size:13px;font-weight:400;margin-left:12px}
+  h1 a:hover{text-decoration:underline}
+  .sub{color:#9FB4C6;font-size:13px;margin-top:4px}
+  .dates{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .datechip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+    padding:4px 10px;border-radius:20px;font-size:12px;color:#CFE0EC}
+  .datechip b{color:#fff}
+  main{max-width:1180px;margin:0 auto;padding:22px 28px 70px}
+
+  .critical{background:#fff;border-left:4px solid var(--amber);border-radius:var(--radius);
+    padding:16px 18px;margin-bottom:22px;box-shadow:0 1px 3px rgba(15,35,56,.07)}
+  .critical h2{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--amber)}
+  .critical p{margin:0 0 6px;font-size:14px;color:var(--navy-2)}
+  .critical .gate{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:14px}
+  .gatetag{background:var(--navy);color:#fff;font-size:11px;font-weight:700;
+    padding:2px 7px;border-radius:3px;flex:none;margin-top:2px}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  .seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;flex-wrap:wrap}
+  .seg button{border:0;background:#fff;padding:8px 14px;font:inherit;font-size:13px;
+    color:var(--slate);cursor:pointer;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--navy);color:#fff;font-weight:600}
+  .seg button:hover:not(.on){background:#EEF3F6}
+  .spacer{flex:1}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--slate);
+    padding:8px 13px;border-radius:var(--radius);font:inherit;font-size:13px;cursor:pointer}
+  .btn:hover{background:#EEF3F6;color:var(--navy)}
+  .btn.danger:hover{background:#FBEDEC;color:var(--red);border-color:#E8C4C1}
+
+  .rollup{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:22px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:13px 15px}
+  .stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--slate-lt);font-weight:600}
+  .stat .num{font-size:24px;font-weight:700;margin:5px 0 7px;color:var(--navy)}
+  .stat .num span{font-size:14px;font-weight:400;color:var(--slate-lt)}
+  .bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--teal);transition:width .3s ease}
+  .stat.done .bar i{background:var(--green)}
+
+  .seat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    margin-bottom:20px;overflow:hidden}
+  .seat > h2{margin:0;background:var(--navy-2);color:#fff;padding:12px 18px;font-size:14px;
+    letter-spacing:1.1px;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:10px}
+  .seat > h2 .pct{margin-left:auto;font-size:12px;font-weight:400;color:#9FB4C6;letter-spacing:0}
+  .horizon{border-top:1px solid var(--line)}
+  .horizon:first-of-type{border-top:0}
+  .hz-head{padding:10px 18px;background:#F7FAFB;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px}
+  .hz-head h3{margin:0;font-size:13px;font-weight:700;color:var(--navy)}
+  .hz-head .due{font-size:12px;color:var(--slate-lt)}
+  .hz-head .cnt{margin-left:auto;font-size:12px;color:var(--slate)}
+  .cat{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--teal-dk);
+    font-weight:700;padding:12px 18px 3px}
+  ul{list-style:none;margin:0;padding:0}
+  li.item{display:flex;gap:11px;align-items:flex-start;padding:8px 18px;border-bottom:1px solid #F0F4F6}
+  li.item:hover{background:#FAFCFD}
+  li.item input[type=checkbox]{margin:3px 0 0;width:16px;height:16px;flex:none;accent-color:var(--teal);cursor:pointer}
+  li.item .txt{flex:1}
+  li.item .txt .t{color:var(--navy-2)}
+  li.item .txt .n{font-size:12.5px;color:var(--slate);margin-top:2px}
+  li.item.checked .txt .t{text-decoration:line-through;color:var(--slate-lt)}
+  li.item.checked .txt .n{color:#B4C0C9}
+  .money{display:inline-block;background:#E6F5F2;color:var(--teal-dk);font-size:11px;font-weight:700;
+    padding:1px 6px;border-radius:3px;margin-left:6px}
+  .blocker{display:inline-block;background:#FBEDEC;color:var(--red);font-size:11px;font-weight:700;
+    padding:1px 6px;border-radius:3px;margin-left:6px}
+  .who{display:inline-block;background:#EEF2F5;color:var(--slate);font-size:11px;font-weight:700;
+    padding:1px 6px;border-radius:3px;margin-left:6px}
+  .watch{display:inline-block;background:#FBF1E3;color:var(--amber);font-size:11px;font-weight:700;
+    padding:1px 6px;border-radius:3px;margin-left:6px}
+
+  /* Brand panels */
+  .bnav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .bnav button{border:1px solid var(--line);background:#fff;color:var(--slate);padding:7px 12px;
+    border-radius:var(--radius);font:inherit;font-size:13px;cursor:pointer;display:flex;gap:7px;align-items:center}
+  .bnav button:hover:not(.on){background:#EEF3F6}
+  .bnav button.on{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600}
+  .bnav button .dot{width:7px;height:7px;border-radius:50%;background:var(--slate-lt);flex:none}
+  .bnav button.rich .dot{background:var(--teal)}
+  .bnav button .n{font-size:11px;opacity:.75}
+
+  .signals{background:#F7FAFB;border-bottom:1px solid var(--line);padding:14px 18px}
+  .signals h4{margin:0 0 9px;font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--slate)}
+  .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:9px}
+  .sig{background:#fff;border:1px solid var(--line);border-radius:4px;padding:8px 11px;font-size:13px}
+  .sig .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--slate-lt);font-weight:700}
+  .sig .v{color:var(--navy-2);margin-top:2px}
+  .sig.warn{border-left:3px solid var(--amber)}
+  .sig.warn .k{color:var(--amber)}
+  .empty{padding:30px 18px;text-align:center;color:var(--slate-lt);font-size:13.5px}
+  .empty b{color:var(--slate);display:block;margin-bottom:4px;font-size:14px}
+
+  /* This week */
+  .week{background:var(--navy);color:#fff;border-radius:var(--radius);padding:16px 18px;margin-bottom:20px}
+  .week h3{margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:1.1px;color:#7FD8CB}
+  .week .wsub{font-size:12.5px;color:#9FB4C6;margin-bottom:11px}
+  .week ul{margin:0}
+  .week li{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+  .week li:last-child{border-bottom:0}
+  .week li input{margin:3px 0 0;width:15px;height:15px;flex:none;accent-color:var(--teal);cursor:pointer}
+  .week li .wt{font-size:14px}
+  .week li .wn{font-size:12px;color:#9FB4C6;margin-top:1px}
+  .week li.checked .wt{text-decoration:line-through;color:#7A8FA1}
+
+  /* Programs */
+  .prog{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    margin-bottom:18px;overflow:hidden;border-left:4px solid var(--teal)}
+  .prog.gate{border-left-color:var(--red)}
+  .prog.clock{border-left-color:var(--amber)}
+  .prog > h2{margin:0;padding:14px 18px 12px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);background:#FAFCFD}
+  .prog .pnum{background:var(--navy);color:#fff;font-size:12px;font-weight:700;padding:3px 9px;
+    border-radius:3px;flex:none}
+  .prog.gate .pnum{background:var(--red)}
+  .prog.clock .pnum{background:var(--amber)}
+  .prog .ptitle{font-size:17px;font-weight:700;color:var(--navy);line-height:1.25}
+  .prog .pmeta{width:100%;display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--slate);margin-top:2px}
+  .prog .pmeta b{color:var(--navy-2)}
+  .prog .pct{margin-left:auto;font-size:12.5px;color:var(--slate-lt);font-weight:400}
+  .pwhy{padding:12px 18px;font-size:13.5px;color:var(--slate);border-bottom:1px solid #F0F4F6;background:#fff}
+  .pwhy b{color:var(--navy-2)}
+  .pexit{padding:10px 18px;font-size:13px;background:#F2FAF8;border-bottom:1px solid var(--line);color:var(--teal-dk)}
+  .pexit b{text-transform:uppercase;font-size:10.5px;letter-spacing:.8px}
+
+  footer{max-width:1180px;margin:0 auto;padding:0 28px 40px;font-size:12px;color:var(--slate-lt)}
+  .saved{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:8px 14px;
+    border-radius:var(--radius);font-size:12.5px;opacity:0;transition:opacity .25s;pointer-events:none}
+  .saved.show{opacity:1}
+  .hidden{display:none !important}
+  @media (max-width:720px){
+    header,main,footer{padding-left:16px;padding-right:16px}
+    .rollup{grid-template-columns:1fr 1fr}
+    .sgrid{grid-template-columns:1fr}
+  }
+  @media print{
+    .controls,.bnav,.saved,footer{display:none}
+    body{background:#fff}
+    .seat,.stat,.critical{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>STAYD — 30/60/90 by Seat <a href="../">← StaydOS</a></h1>
+    <div class="sub">Chris (COO) · Director of Revenue Management + COO tracks · ladders to 2027 brand &amp; property revenue goals</div>
+    <div class="dates">
+      <div class="datechip">Start <b>Jul 13, 2026</b></div>
+      <div class="datechip">30 days <b>Aug 12</b></div>
+      <div class="datechip">60 days <b>Sep 11</b></div>
+      <div class="datechip">90 days <b>Oct 11</b></div>
+      <div class="datechip">Ahead of <b>2027 budget season</b></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="critical">
+    <h2>Critical path</h2>
+    <p>Two gates hold up most of this list. If they slip, everything behind them slips.</p>
+    <div class="gate"><span class="gatetag">G1</span><div><b>Guesty + financial access, all 8 brands</b> — blocks take rate, HK margin, maintenance margin, fee modeling, GM measurables, brand goal setting. <i>Target: Aug 12.</i></div></div>
+    <div class="gate"><span class="gatetag">G2</span><div><b>Key Data source of truth live</b> — blocks OTAmiser conversations, pacing/market reports, occupancy-lift baseline, fee justification. <i>Target: this week for brands with KD access, Aug 12 for all.</i></div></div>
+    <p style="margin-top:12px"><b>Sequencing:</b> the OTAmiser occupancy lift is the <i>reason</i> the fee increases land. Baseline it in 30, open the fee conversation in 60.</p>
+    <p style="margin-top:6px;color:var(--amber)"><b>Live warning from 30North:</b> OTAmiser has occupancy up but rates running low. The lift needs a rate guardrail attached before it becomes the fee argument elsewhere — otherwise you buy occupancy with RevPAR.</p>
+    <p style="margin-top:6px;color:var(--red)"><b>Definition problem, from Stay Texas:</b> 30North says take rate ~10%. Big Fish says 20%. Stay Texas says ~48%. Those are not three points on one distribution — they are three different metrics sharing a word. Fix the definition before the portfolio target, the fee models, or the 2027 goals are built on it.</p>
+    <p style="margin-top:6px;color:var(--red)"><b>Change-load warning, from Stay Texas:</b> Matt ran PMS migration + Breezeway + rebrand in one 90-day sprint and lost Superhost for the first time since 2013. We are planning eight initiatives across eight brands. Sequence per brand, not per initiative.</p>
+    <p style="margin-top:6px;color:var(--red)"><b>The fork, 30North vs. Renjoy:</b> 30North is turning maintenance INTO a profit center (30% net margin target). Renjoy deliberately runs it at BREAK-EVEN to avoid driving owners away. Haven loses money on it and is fighting to reach break-even. Two of three sit at or below zero — 30North may be the outlier, not the model.</p>
+    <p style="margin-top:6px;color:var(--red)"><b>And the number that may settle it — Haven: 85% of owners are cash-flow negative.</b> Three brands are losing owners because the asset does not pencil. You cannot raise take rate on owners who are already underwater.</p>
+    <p style="margin-top:6px;color:var(--red)"><b>Host2Coast closes the argument.</b> The flagship $300K fee increase targets a brand already at a 45% take rate — the wall Stay Texas hit at 48% and retreated from. But the $300K is sitting in his P&L anyway: housekeeping margin at 13% against a 30% target, a $625K amenity program netting at best $200K, and $175K/yr on inspections Haven proved may be unnecessary. Same money, no owner conversation, no occupancy risk. <b>Model the margin path before the fee path.</b></p>
+    <p style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)"><b>Discovery complete — all 8 brands.</b> The original plan was: raise fees at three brands, fix the weak ones, set 2027 goals. The evidence says otherwise. Fees are already at the ceiling where we planned to raise them. A large share of owners are underwater — both the churn driver and the reason fees cannot rise. The money is in <b>margin and ancillary</b>: the damage waiver (4-for-4, does not touch owners), housekeeping margin, amenity execution, inspection spend. And every brand already holds a piece of the answer another brand is missing. <b>The highest-value 90-day deliverable may be the exchange itself, not the goals.</b></p>
+  </div>
+
+  <div class="controls">
+    <div class="seg" id="seatSeg">
+      <button data-seat="prog" class="on">Programs</button>
+      <button data-seat="all">All seats</button>
+      <button data-seat="rev">Rev Management</button>
+      <button data-seat="coo">COO</button>
+      <button data-seat="brand">By brand</button>
+    </div>
+    <div class="seg" id="hzSeg">
+      <button data-hz="all" class="on">All horizons</button>
+      <button data-hz="30">30</button>
+      <button data-hz="60">60</button>
+      <button data-hz="90">90</button>
+    </div>
+    <div class="seg" id="doneSeg">
+      <button data-done="all" class="on">Show all</button>
+      <button data-done="open">Open only</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" onclick="exportJSON()">Export progress</button>
+    <button class="btn" onclick="document.getElementById('imp').click()">Import</button>
+    <input type="file" id="imp" accept=".json" class="hidden" onchange="importJSON(event)">
+    <button class="btn" onclick="window.print()">Print</button>
+    <button class="btn danger" onclick="resetAll()">Reset</button>
+  </div>
+
+  <div class="rollup" id="rollup"></div>
+  <div id="progWrap" class="hidden">
+    <div id="thisWeek"></div>
+    <div id="programs"></div>
+  </div>
+  <div id="seats"></div>
+  <div id="brandWrap" class="hidden">
+    <div class="bnav" id="bnav"></div>
+    <div id="brandPanel"></div>
+  </div>
+
+</main>
+
+<footer>
+  <b>Programs</b> is the plan — seven workstreams drawn from all eight discovery calls. <b>Seats</b> and <b>By brand</b> are the evidence behind it.
+  They share the same items: tick something anywhere and it ticks everywhere.
+  &nbsp;·&nbsp; Progress saves in this browser only (localStorage). <b>Export progress</b> before replacing this file or switching machines.
+  &nbsp;·&nbsp; Reports up through the weekly huddle: COO block + Rev Mgmt block.
+</footer>
+
+<div class="saved" id="saved">Saved</div>
+
+<script>
+const KEY = 'stayd_306090_v1';
+const DUE = { 30:'Aug 12', 60:'Sep 11', 90:'Oct 11' };
+
+const DATA = {
+  rev: {
+    name: 'Director of Revenue Management',
+    horizons: {
+      30: [
+        { cat:'Definition first — everything downstream depends on these two', items:[
+          { id:'r30-18', t:'What share of owners are cash-flow NEGATIVE, per brand?', b:1, w:1, n:'Haven says 85%. If that is anywhere near true at Host2Coast or Big Fish, the fee increases are aimed at owners who are already underwater — and the churn we are trying to fix is the churn we would be causing. This single number decides whether the take-rate program is "raise the fee" or "make the owner money." Run it before either fee conversation opens.' },
+          { id:'r30-16', t:'Standardize what "take rate" actually means across all 8 brands', b:1, w:1, n:'The numbers now fall into two obvious clusters: 30North ~10% and Big Fish 20% · Host2Coast 45% and Stay Texas 48%. Nobody sits in between. That is not a distribution — that is two different metrics wearing the same word (management commission vs. total capture including fees). Until this is fixed, the portfolio target, the fee models, the margin work and the 2027 goals are all built on sand.' },
+          { id:'r30-17', t:'Rebuild every brand\u2019s take rate on the standard definition', n:'Then, and only then, compare them.' },
+        ]},
+        { cat:'Data & source of truth', items:[
+          { id:'r30-1', t:'Key Data Enterprise account', n:'Scope, pricing, brand coverage, contract to Aidan.' },
+          { id:'r30-2', t:'Stand up pacing + market-level reports for brands that already have KD access', n:'Turn around this week.' },
+          { id:'r30-3', t:'Publish the KD-access gap list', n:'Which brands are missing, what it costs to close.' },
+          { id:'r30-4', t:'Feed the first pacing/market pack into the OTAmiser conversation', n:'Per-unit guidelines, parameters, minimums. Jarne on all calls.' },
+        ]},
+        { cat:'Channel / enterprise', items:[
+          { id:'r30-5', t:'Tim R meeting — VRBO enterprise account', n:'Support tier, marketing co-op, perks, eligibility. This week.' },
+          { id:'r30-6', t:'VRBO one-pager: what the enterprise account gets us vs. costs us' },
+        ]},
+        { cat:'Fee structure — diagnose only', items:[
+          { id:'r30-7', t:'Resolve the fee markup retention question (JJ / Riley)', b:1, n:'Unblocks the entire fee-breakdown exercise.' },
+          { id:'r30-8', t:'Build the current-state fee stack by brand', n:'Flat rate, %, cleaning, markup, ancillary.' },
+          { id:'r30-9', t:'OTAmiser occupancy-lift baseline', n:'Capture pre-OTAmiser occ/RevPAR by unit so the lift is provable, not projected.' },
+        ]},
+        { cat:'Rate guardrail — from 30North', items:[
+          { id:'r30-10', t:'OTAmiser rate-erosion check across every live brand', w:1, n:'Results now vary and the pattern is informative. 30North: occupancy up, RATES RUNNING LOW. Big Fish: ~10% Airbnb uptick, limited elsewhere, switching from PriceLabs mid-August. Beachside: working well and revenue up YoY — and notably, they are the brand actually doing the RANKING work. Host2Coast is hard because of unusual check-in/checkout rules. The tool may only pay where someone works it. Confirm the lift is RevPAR-positive, not occupancy-positive, everywhere.' },
+          { id:'r30-11', t:'Stand up the internal revenue reporting cadence with OTAmiser', n:'Accountability layer so an occupancy-driven strategy cannot quietly sacrifice rate. Bartjan + Jarne. Chad flagged the same need independently.' },
+        ]},
+        { cat:'The OTAmiser proving ground — from Big Fish. HARD DEADLINE.', items:[
+          { id:'r30-12', t:'Capture Chad\u2019s pre-switch PriceLabs baseline BEFORE mid-August', b:1, w:1, n:'Big Fish moves PriceLabs → OTAmiser mid-August. Chad is an early PriceLabs customer who helped build their features and prices by hand 20 min/day. His challenge: OTAmiser must beat him by 10%. Miss the baseline window and the single best proof point in the portfolio is unrunnable.' },
+          { id:'r30-13', t:'Get on every OTAmiser rollout call for Big Fish', who:'Chris', n:'Already reached out. Stay across the transition.' },
+        ]},
+        { cat:'VRBO — from Big Fish. Take this into the Tim R meeting.', items:[
+          { id:'r30-14', t:'Bring Big Fish\u2019s VRBO ad economics to Tim R', m:'25–33x', w:1, n:'$6K spend → $150–200K in bookings at $3–5/ad. Only 1–2 operators in Myrtle Beach running them aggressively. This is a proven in-portfolio case study, not a hypothetical — use it as the enterprise-account argument.' },
+          { id:'r30-15', t:'Document the VRBO ad playbook for export to all 8 brands', n:'Cheapest proven acquisition channel found so far anywhere in the portfolio.' },
+        ]},
+      ],
+      60: [
+        { cat:'Data & source of truth', items:[
+          { id:'r60-1', t:'Key Data enterprise closed; remaining brands onboarded' },
+          { id:'r60-2', t:'Pacing/market reports running weekly for all 8 brands' },
+          { id:'r60-3', t:'Measured OTAmiser occupancy lift published', n:'RevPAR-based, not occupancy-only. The evidence that carries the fee conversation.' },
+        ]},
+        { cat:'Fee structure — model & open', items:[
+          { id:'r60-4', t:'Host2Coast — the $300K is real, but it is NOT in the fee', b:1, w:1, m:'~$300K', n:'He is already at a 45% take rate. Stay Texas was at 53%, found it visibly suppressed occupancy, cut to 48%, and is still cutting. H2C is sitting at the wall someone else already hit — and we have not measured what share of his owners are cash-flow negative. But the $300K exists elsewhere in his P&L: housekeeping margin at 13% against Riley\u2019s 30% target · a $625K amenity program netting "at best $200K" · $175K/yr on inspections that Haven proved may be unnecessary. Same money. No owner conversation, no occupancy risk, no churn risk. Model the margin path BEFORE the fee path.' },
+          { id:'r60-22', t:'If the fee increase survives that analysis, then model it', n:'It may still be right. But it should win the argument against the margin path, not skip it.' },
+          { id:'r60-5', t:'Big Fish — DECIDE before modeling: fee increase vs. the 20% moat', b:1, w:1, n:'The ~$100K on 30,000 turns is real. But Chad\u2019s owner-acquisition pitch IS the 20% commission vs. competitors at 40% — it is what makes the postcard campaign convert. Raising the fee taxes the growth engine. This is a trade to decide explicitly, not a number to model quietly.' },
+          { id:'r60-6', t:'Blue Gems — %-based fee structure', n:'Discovery surfaced no fee-structure complaint here. Their revenue problem is owner PROFITABILITY (churn from owners not making money) and their margin problem is review score and local ops. Confirm the %-based fee work is still the right priority for this brand before spending the cycles.' },
+          { id:'r60-7', t:'Fee conversations opened with H2C, Big Fish, Blue Gems', n:'Lift first, fee second.' },
+        ]},
+        { cat:'Take-rate lever menu — cross-brand', items:[
+          { id:'r60-9', t:'Build the standard take-rate lever set every brand gets assessed against', n:'Fee structure (% vs. flat, seasonal) · damage waiver · maintenance as profit center · housekeeping margin (laundry in-house) · consumables at scale · seasonal programs (hurricane prep, winterization).' },
+          { id:'r60-10', t:'Set a portfolio take-rate target', n:'GATED on r30-16. Cannot be set until the metric means the same thing everywhere.' },
+          { id:'r60-14', t:'Find the take-rate ceiling before raising anyone\u2019s', w:1, n:'Stay Texas took take rate DOWN from ~53% to ~48% because it was visibly suppressing occupancy, and is targeting further reduction. The H2C and Big Fish increases assume take-rate lift is free money. Someone in this portfolio has already found a wall. Model the elasticity, do not assume it away.' },
+          { id:'r60-11', t:'Damage waiver — ROLL OUT, using the strongest combined design', m:'4-for-4', w:1, n:'Big Fish: tiered $19–$49, MANDATORY, ~99% to the bottom line. Renjoy: $200K in 12 months. Haven: ~$200K/yr waiver PLUS a separate damage FEE — $70–90K/month combined — but OPT-OUT, and owners took the option. Host2Coast: damage protection fee is "pure profit." Four brands, four independent confirmations. Best design = Haven\u2019s two layers + Big Fish\u2019s mandatory wrap + tiering. It raises revenue WITHOUT touching owner economics, so it does not feed sale-driven churn. Four brands still do not have it.' },
+          { id:'r60-12', t:'Linen ownership model assessed for other brands', n:'Big Fish took ownership of sheets/towels/comforters ~1 year ago and calls it their single biggest operational improvement — owner complaints about missing/damaged items stopped.' },
+          { id:'r60-19', t:'Upsell benchmark now exists: $150K', m:'Renjoy', n:'Early/late checkout + pet fees. Gives the guest-journey upsell workstream an actual number to target rather than an aspiration.' },
+        ]},
+        { cat:'THE FORK — resolve this before the take-rate program goes anywhere', items:[
+          { id:'r60-20', t:'Maintenance: profit center, or protected to keep owners?', b:1, w:1, n:'30North is building maintenance INTO a profit center — $199/qtr × 320 listings ≈ $250K, 30% net margin target, bonus above. Renjoy deliberately runs maintenance at BREAK-EVEN — $25–30/hr cost billed at $90 — explicitly to avoid creating owner churn. Two founders, same lever, opposite bets. Meanwhile two brands are already losing owners because the asset does not pencil. This is the central question of the whole take-rate program and it cannot be answered brand-by-brand.' },
+          { id:'r60-21', t:'Separately: audit Renjoy\u2019s break-even claim', w:1, n:'$90 billed on $25–30 labor should throw a ~67% gross margin. Breaking even means something is eating it — utilization, dispatch overhead, a revolving door of 6–7 handymen. Their STRATEGY may be a choice; their break-even looks like leakage. Do not adopt the position until the arithmetic is understood.' },
+        ]},
+        { cat:'OTAmiser product gaps — raise with Bartjan + Jarne', items:[
+          { id:'r60-13', t:'Channel-coverage gap: OTAmiser is Airbnb-heavy', w:1, n:'Chad\u2019s data backs the concern — ~10% uptick on Airbnb, limited impact on other channels, while VRBO is his fastest-growing. If the tool only moves one channel, the lift argument weakens everywhere direct and VRBO matter.' },
+          { id:'r60-16', t:'Pressure-test OTAmiser ROI at Stay Texas before spending the cycles', w:1, n:'84% of their reservations come through their own direct site. OTAmiser optimizes OTA listings and ranking. Confirm there is enough OTA volume there to be worth optimizing — this may be the wrong tool for that brand.' },
+        ]},
+        { cat:'Direct booking — model the economics BEFORE evangelizing it', items:[
+          { id:'r60-15', t:'Model the true unit economics of a direct booking', b:1, w:1, n:'Stay Texas runs 84% direct. Blue Gems runs direct too but Aidan challenges the value: they capture only ~20% of a direct booking, so winning one trades an OTA commission for ad spend — and he is not convinced it nets out. He is right to ask. Direct is only a lever if capture rate makes it pay, which means this is the SAME problem as the take-rate definition. Model it: ad cost per direct booking vs. OTA commission avoided, at each brand\u2019s actual capture rate.' },
+          { id:'r60-17', t:'Only then decide whether there is a direct-booking playbook to export', n:'If the economics hold, Stay Texas wrote the book. If they do not, we just saved seven brands from chasing it.' },
+          { id:'r60-18', t:'Segment demand before buying it', n:'Blue Gems cannot justify marketing to individuals — their demand is groups: travel agencies, AAU baseball, large-bedroom-count homes. 30North\u2019s OTA demand is so substantial that direct is a different calculation entirely. Direct-booking strategy is not one strategy.' },
+        ]},
+        { cat:'Channel / enterprise', items:[
+          { id:'r60-8', t:'VRBO enterprise perks activated, or decision made' },
+        ]},
+      ],
+      90: [
+        { cat:'2027 goal setting', items:[
+          { id:'r90-1', t:'2027 revenue goals set by brand', n:'RevPAR, ADR, occupancy, take rate.' },
+          { id:'r90-2', t:'2027 revenue goals set by property', n:'Same-store separated from new inventory.' },
+        ]},
+        { cat:'Close out', items:[
+          { id:'r90-3', t:'Fee changes approved, sequenced, owner comms drafted' },
+          { id:'r90-4', t:'Rev mgmt reporting pack folded into the weekly huddle as a standing block' },
+        ]},
+      ],
+    }
+  },
+  coo: {
+    name: 'COO',
+    horizons: {
+      30: [
+        { cat:'Before you fund QA — two brands, opposite answers, one testable number', items:[
+          { id:'c30-27', t:'Test the QA MECHANISM before rolling out an inspector layer', b:1, w:1, n:'Haven ELIMINATED dedicated inspections and their scores did NOT drop — cleaners mini-inspect, maintenance and runners inspect while on site. Host2Coast spends $175K A YEAR on inspections. Blue Gems has NO maintenance/QA accountability and is losing score (4.6 → 4.3). So: accountability clearly matters, a dedicated inspector layer may not. Run Beachside on distributed accountability, Blue Gems on inspectors, and let the scores decide. $175K/yr at one brand alone is riding on the answer.' },
+          { id:'c30-28', t:'Note the one exception', n:'Haven\u2019s cleaning COMPANY does have inspectors who go behind the cleaners. So inspection exists — it just sits inside the cleaning business, not the management business. That may be the actual answer.' },
+          { id:'c30-35', t:'Caveat before cutting anything at Host2Coast', w:1, n:'Hospitality IS their differentiator — realtors call them, CAC is low, owners like the office. Haven could cut inspections because hospitality was not the thing they were selling. He has already replaced inspectors with STAGERS doing amenities and flowers — that may be the middle path.' },
+          { id:'c30-47', t:'Beachside already built the instrument that settles this', b:1, w:1, n:'They started tracking REFUNDS BY CATEGORY — how many of each type, where the money is actually lost, and how maintenance tickets alter revenue. Beachside\u2019s entire case for inspections is: pay up front rather than refund guests and eat negative reviews. That is a testable ROI, and Haven\u2019s counter-experiment never measured it. The number is REFUND COST AVOIDED vs. INSPECTION COST. Host2Coast\u2019s $175K/yr is riding on it. Run this cut first — it is cheaper than either rollout.' },
+        ]},
+        { cat:'The biggest margin miss in any brand', items:[
+          { id:'c30-36', t:'Host2Coast housekeeping margin: 13% → 30%', b:1, w:1, n:'Riley\u2019s number. This is the largest identified margin gap anywhere in the portfolio and it does not require an owner conversation, a fee change, or any occupancy risk. Combined with the amenity-program margin and the inspection line, this is where the $300K actually lives.' },
+          { id:'c30-37', t:'Amenity program margin repair', m:'$625K gross', w:1, n:'$125 amenity fee × ~5,000 arrivals = $625K collected. ~$325K spent on amenities, $175K on inspections. He estimates it nets "at best $200K" — the arithmetic suggests it may be closer to $125K. On a $625K line that is a 20–32% margin. Get the real numbers, then fix the execution. The revenue is already being collected.' },
+          { id:'c30-38', t:'Export the Host2Coast hospitality playbook anyway', n:'Full-size amenities, black makeup towels, canvas totes, cookies, bottled water, koozies, orange beach towels, handwritten notes, fresh flowers, toolbox under the sink, salt/pepper/foil. It drives low CAC and inbound realtor referrals. The program works — it is the MARGIN that needs work, not the concept. Haven\u2019s weakness is service recovery; this is the opposite end of the same spine.' },
+        ]},
+        { cat:'Cleaning — three brands, three different models', items:[
+          { id:'c30-29', t:'Pick a cleaning model, or decide it is market-dependent', w:1, n:'Renjoy: brought HK in-house on W2 ($19–20/hr) and swung $200K. Haven: built a SEPARATE cleaning company with its own GM, turning ~$200K profit, now absorbing all Haven cleans. 30North: still on 15–20 third-party teams against ~$2M of cleaning fee income, planning to in-house. Three brands, three structures. Before 30North commits, they should see both models that already exist.' },
+        ]},
+        { cat:'AI ops — Haven is a generation ahead. Michael should own this.', items:[
+          { id:'c30-30', t:'Make Haven\u2019s AI ops architecture the STAYD standard', w:1, n:'Conduit flags a guest issue → a Slack agent drafts the work order → a human approves → the agent executes and reports back → the team reviews. Over 90% of guest comms automated. An owner-side agent that reads owner notes before replying. This is human-in-the-loop, in production, today. Renjoy is the only other brand close.' },
+          { id:'c30-31', t:'Michael (Renjoy) + Haven = the tech function', n:'Michael is already slated for IT/Tech at STAYD level and Renjoy is the other tech-forward brand. Pair them rather than building a third thing centrally.' },
+          { id:'c30-32', t:'Evaluate Trellis', n:'Haven\u2019s biggest complaint is tool disconnect — SuiteOp, Conduit, Breezeway, lock control all separate. Trellis is their bet on unifying it. That is a stack decision with portfolio consequences; make it deliberately, not brand-by-brand.' },
+        ]},
+        { cat:'Change-load discipline — Matt\u2019s warning. Read this before rolling anything out.', items:[
+          { id:'c30-13', t:'Set a change-load limit per brand per quarter', b:1, w:1, n:'Stay Texas migrated Track → Guesty, onboarded Breezeway, and rebranded in one 90-day sprint. Result: software issue after software issue, guests and owners fell out of sight, and they lost Airbnb Superhost for the first time since 2013. We are currently planning Guesty, OTAmiser, Conduit, Key Data, NetSuite, guest journey, QA and comp plans — across eight brands. Matt\u2019s explicit concern about the holdco is too many launches at once. He has already run this experiment for us.' },
+          { id:'c30-14', t:'Sequence the STAYD rollout per brand, not per initiative', n:'Initiative-led rollouts hit every brand at once. Brand-led rollouts respect what each brand is already carrying.' },
+        ]},
+        { cat:'Cross-brand asset exchange — the brands already hold the answers', items:[
+          { id:'c30-15', t:'Stand up the cross-brand playbook', w:1, n:'Matt is asking for this unprompted: real P&L benchmarking across brands, and "secret sauce" sharing — Haven on AI/automation, Aidan on accounting, Andrew/Danny on HubSpot. Big Fish holds the damage waiver, VRBO ads, linen model and postcard channel. 30North holds the take-rate lever set. Stay Texas holds EOS, H2B labor and 84% direct. None of them know what the others have.' },
+          { id:'c30-16', t:'Match Stay Texas\u2019 H2B visa program to 30North\u2019s in-housing plan', w:1, n:'Stay Texas ran H2B successfully for 4 years — 20+ seasonal workers across housekeeping, maintenance, landscaping and laundry. Paused this year, will reassess, and Matt flagged it as a resource for other holdco brands. 30North is simultaneously trying to bring cleaning and laundry in-house and needs exactly this labor. Connect them.' },
+          { id:'c30-17', t:'Evaluate EOS as a StaydOS input', n:'Stay Texas has run EOS for ~4 years: annual goals, quarterly rocks, budgets and metrics cascaded to every department, SOPs visible to everyone. That is an operating system that already works. Do not reinvent it from zero.' },
+          { id:'c30-19', t:'Blue Gems Blueprint as a portfolio product', w:1, n:'Renovation, design, project management, turnkey STR — sold as a separate fee service to owners who overpaid and cannot make the numbers work. It is an ancillary revenue line AND a direct answer to sale-driven churn. No other brand has anything like it. Three brands need it.' },
+          { id:'c30-23', t:'Renjoy briefs 30North on the 1099 → W2 housekeeping conversion', w:1, m:'$200K swing', n:'Renjoy made this exact move two years ago: 1099 → W2 at $19–20/hr, and went from LOSING $100K a year to MAKING $100K. Their warning: the culture side (purpose, growth) never landed and they now want to revisit piece rate. 30North is about to bring cleaning in-house against ~$2M of cleaning fee income. This briefing is worth more than any consultant.' },
+          { id:'c30-48', t:'Corporate housing: Beachside is doing it, Renjoy is sitting on the demand', w:1, n:'Beachside has Blue Origin placing 2–8 employees on 12-month leases through a corporate housing company. Renjoy has heavy DOD/military demand and says corporate housing "never really kicked off." One brand has the playbook, the other has the customers. Connect them.' },
+        ]},
+        { cat:'Route these — they are not COO questions', items:[
+          { id:'c30-39', t:'Give Host2Coast the accounting / NetSuite plan. This week.', b:1, w:1, n:'His stated BIGGEST issue is not revenue — it is accounting uncertainty. NetSuite keeps getting pushed back, he is coming off a bad experience, his son is doing the bookkeeping in Topkey, and nobody has told him the plan or what to do in the meantime. Aidan owns NetSuite; Blue Gems is already leading the build. This is a routing job, not a project — and it buys trust with the brand we are about to ask the most of.' },
+          { id:'c30-40', t:'Topkey is now at two brands — decide centrally', n:'Blue Gems and Host2Coast both run it. Keep, replace, or absorb — before NetSuite lands, not after.' },
+          { id:'c30-24', t:'Jacob\u2019s asks → Aidan and Riley', b:1, n:'Owner compensation framework · the 2026 P&L and how it matters · when founders step out of operating roles once the Ops Director becomes GM (3–6 months) · what salaries look like after that. These are holdco/CFO questions. Route them, do not absorb them.' },
+          { id:'c30-25', t:'Gross margin standards — two brands now asking for the same thing', w:1, n:'Jacob wants to know what "normal" looks like as a percentage. Matt wants real cross-brand P&L benchmarking. Same request, two independent founders, unprompted. It is already on our list — ship it, and it converts skeptics into allies.' },
+          { id:'c30-26', t:'Services-as-a-service → Jack (CRO)', w:1, n:'Renjoy sells revenue management, guest services and housekeeping AS SERVICES outside their own market — per-turn, on their W2 crews, with standard procedures and supplies. Jack reportedly does something similar locally. That is a B2B product line, not an ops workstream. It belongs to the CRO.' },
+          { id:'c30-33', t:'Haven\u2019s sales process → Jack (CRO). He is already sitting on it.', w:1, n:'Jack co-founded Haven, and Haven\u2019s sales machine is the best in the group by their own account and everyone else\u2019s: daily role-play and training through 2024, strong conversion and closing, competing in the Smokies against 10% commission and waived fees in a market that went from 10K to 20K listings. Riley has never needed a sales process. Jack is in the CRO seat with the playbook already in his head — it just is not written down or exported.' },
+          { id:'c30-34', t:'Haven\u2019s weakness is a guest-journey item, not a sales one', n:'Their own words: they solve the problem but the guest is not happy at the end. They are weak at turning problems into happy people. That is service recovery — exactly what the Beachside guest-services training should be built to fix. Two brands, one workstream.' },
+        ]},
+        { cat:'What is STAYD? — internal comms', items:[
+          { id:'c30-20', t:'Explain what STAYD is, to the brands', b:1, n:'Aidan, verbatim: the Blue Gems team does not understand what STAYD is or how it relates to them — it is a term thrown around with not much behind it. If the people executing this cannot articulate it, none of the rollouts land. Assume this is true at all eight brands until proven otherwise.' },
+          { id:'c30-21', t:'Write the one-page "what STAYD does for your brand"', n:'Per seat, per brand. What they give, what they get, what changes and what does not.' },
+        ]},
+        { cat:'Access — the gate', items:[
+          { id:'c30-1', t:'Guesty access + financial access, all 8 brands', b:1, n:'Escalate anything not delivered in 2 weeks.' },
+          { id:'c30-2', t:'First-pass margin scan once access lands', n:'Where is the money leaking — HK vs. maintenance vs. take rate.' },
+        ]},
+        { cat:'Guest journey & upsell', items:[
+          { id:'c30-3', t:'Audit current guest-journey cadence in each brand', n:'What exists, what is ad hoc.' },
+          { id:'c30-4', t:'Draft the STAYD standard journey', n:'Pre-book → pre-arrival → in-stay → post-stay, with upsell touchpoints named.' },
+        ]},
+        { cat:'Conduit / guest messaging', items:[
+          { id:'c30-5', t:'Define the KPI set', n:'Call handling, message handling, response time, recurring issue themes.' },
+          { id:'c30-6', t:'Stand up the training cadence', n:"Use Stephen's AI + recordings process." },
+          { id:'c30-41', t:'Conduit is generating friction at two brands — investigate', w:1, n:'Stephen calls the flow a "free-for-all" that forces you to split people up to see who is doing what, where Guesty + DialPad let people work simultaneously. Host2Coast is separately nervous about it. This is our guest CRM and two of eight are pushing back. Find out if it is a config problem, a training problem, or a product problem.' },
+        ]},
+        { cat:'STEPHEN\u2019S HUB — the delivery system the whole playbook has been missing', items:[
+          { id:'c30-42', t:'Make Beachside\u2019s training hub the STAYD delivery mechanism', b:1, w:1, n:'Stephen has built, in Claude Code: role-based training modules with certification-style completion, an owner-relations handbook (buzzwords, what to say, how to handle visits), an owner onboarding revenue sheet explaining pricing/reviews/visibility, and GEMINI ROLE-PLAY so agents practice against simulated guests and owners before going live. Look at what is queued in this tracker with nowhere to land: Luke\u2019s owner-relations training, Haven\u2019s service recovery, Blue Gems\u2019 review score, Conduit KPI training, Host2Coast\u2019s hospitality playbook. All curriculum. No delivery system. He built the delivery system.' },
+          { id:'c30-43', t:'Resolve the Luke / Stephen overlap on owner relations', b:1, n:'Both are building owner-relations training. Luke has the relationships, the churn thesis and the sentiment prototype. Stephen has the curriculum, the handbook and the AI role-play engine. That is complementary, not duplicative — but only if someone says so out loud this week. Left alone it becomes two competing programs.' },
+          { id:'c30-44', t:'Back Stephen\u2019s agent proposals — they are the right ones', n:'His own ideas, unprompted: agents that guide team members through their day and check in, with one person monitoring productivity and AGENT tone (not just guest tone); and AI trained to elevate an already-good guest reply into best-in-class hospitality. Pair him with Haven and Michael (Renjoy) — that is the AI function, fully staffed, already building.' },
+          { id:'c30-45', t:'Beachside\u2019s multi-company permissions layer', n:'They have built admin levels and multi-company triggers to cycle through companies and departments — not yet implemented. That is StaydOS infrastructure sitting unused in one brand.' },
+        ]},
+        { cat:'Policy standardization — the unpriced dependency', items:[
+          { id:'c30-46', t:'Standardize policies BEFORE centralizing guest services', b:1, w:1, n:'Riley wants guest services centralized in 6 months. Stephen\u2019s objection is correct and load-bearing: you cannot put one agent pool across eight brands until the policies are standardized, or there is too much for any agent to hold. Policy standardization is a PREREQUISITE, not a parallel track — and right now it is on nobody\u2019s list. Either it gets an owner and a date, or the 6-month target is fiction.' },
+        ]},
+        { cat:'Owner relations / churn', items:[
+          { id:'c30-7', t:'Luke — start from the tool he ALREADY BUILT, not from zero', b:1, w:1, n:'Luke prototyped an owner-relations product: logged every owner call, email and text through Conduit, pulled sentiment, and made churn risk measurable — what owners spend time on, what they care about, top risks of leaving. He shelved it when AI leapt and SaaS looked unattractive. He also spotted that M&A rollups track owner retention but have no tools, no profiles, no way to act. We asked him for a churn baseline. He has a working prototype and a thesis. Resurrect it.' },
+          { id:'c30-10', t:'Split churn into categories before Luke builds anything', w:1, n:'SALE-DRIVEN churn dominates: 30North (rates, insurance, taxes up), Blue Gems (~1 home/month — owners not making enough). Renjoy adds SELF-MANAGEMENT churn — 15 owners left to self-manage or sell, and churn has risen in the last 6 months. Big Fish has ~10% chronic "jumpers" leaving over minor irritations. Four brands, four different churn types. Retention tactics only touch one of them.' },
+          { id:'c30-18', t:'Reframe the churn workstream around owner profitability', w:1, n:'Three of five brands are losing owners because the numbers do not work for the owner. That is not a retention problem — it is a revenue-management and ancillary-product problem. Tell Luke before he builds the wrong thing.' },
+          { id:'c30-22', t:'Luke runs owner-relations training calls across all brands', n:'His own framing, and the founders agree: centralize owner relations at the STAYD level with Luke leading. He is the strongest owner-relations operator in the group by consensus.' },
+          { id:'c30-12', t:'Steal Big Fish\u2019s owner-acquisition channel', m:'$0.80/card', n:'Vistaprint postcards: ~6,000 sent every 3–4 months → 10–20 leads → 5–10 conversions. Cheap, repeatable, and nobody else in the portfolio is doing it.' },
+        ]},
+        { cat:'People', items:[
+          { id:'c30-8', t:'Blue Gems: hire the LOCAL OPS LAYER, not just a GM', w:1, n:'Aidan\u2019s framing: great remote team, great maintenance team, no bridge between them. No property manager role exists — 3 ops coordinators dispatch remotely. A GM title on top of the same structure does not close the gap. Define the boots-on-the-ground role first, then hire it.' },
+          { id:'c30-9', t:'Define what "measurable" means for a GM', n:'One page, same for all 8.' },
+          { id:'c30-11', t:'Pull 30North\u2019s GM/PM comp plan as a possible STAYD template', n:'KPI-linked, live July 1. KPIs: guest services, churn, maintenance, cleaning rating, profitability, owner acquisition.' },
+        ]},
+      ],
+      60: [
+        { cat:'Guest journey & messaging', items:[
+          { id:'c60-1', t:'Guest journey standard published and implemented', n:'Upsell goal attached.' },
+          { id:'c60-2', t:'Conduit KPIs measured weekly; monthly action-item review with fixes assigned' },
+        ]},
+        { cat:'Financial', items:[
+          { id:'c60-3', t:'Take rate analysis complete', n:'Financials in hand → goal + named drivers per brand.' },
+        ]},
+        { cat:'Owner relations', items:[
+          { id:'c60-4', t:'Owner Relations playbook v1 from Luke' },
+          { id:'c60-5', t:'Churn attack plan per brand, Luke leading' },
+          { id:'c60-8', t:'Key-man risk audit across all brands', w:1, n:'30North/Ancient City: Danny personally holds the owner relationships. Assume this pattern exists elsewhere. 12–18 month transitions.' },
+        ]},
+        { cat:'People & QA', items:[
+          { id:'c60-6', t:'GM placements made; training underway' },
+          { id:'c60-7', t:'Beachside SHIPS the training system — it is not a test case', n:'Reversed. Stephen already built it. Blue Gems is the first recipient (burning review score, clear before/after).' },
+        ]},
+      ],
+      90: [
+        { cat:'Scale what worked', items:[
+          { id:'c90-1', t:'QA program rolled out — but only after the mechanism is settled', b:1, w:1, n:'BLOCKED on c30-27. Haven ELIMINATED dedicated inspections and their scores did not drop. Do not fund an inspector layer until we know it beats the cheaper distributed model.' },
+          { id:'c90-2', t:'HK margin and maintenance margin targets set per brand, with an owner' },
+          { id:'c90-3', t:'GM scorecard live for all 8 brands, running through the Founder–GM cadence' },
+          { id:'c90-4', t:'Ops inputs handed to the 2027 goal-setting exercise', n:'Occupancy, upsell, margin, churn.' },
+        ]},
+      ],
+    }
+  }
+};
+
+const BRANDS = [
+  {
+    key:'30north', name:'30North', rich:true,
+    note:'Two entities merging under 30North: Joseph Ellen (Andrew) + Ancient City Hideaways (Danny). Nomad acquisition close — 60 condos. Most-changed brand in the group over the last six months.',
+    signals:[
+      { k:'Take rate', v:'~10% both entities · target 15%' },
+      { k:'GBV', v:'Joseph Ellen ~$10–12M · Ancient City ~$8–9M' },
+      { k:'Net revenue', v:'Combined ~$2M target · $2.5–3M with Nomad' },
+      { k:'Occupancy', v:'Andrew 56% T12M · Danny slightly higher' },
+      { k:'OTAmiser', v:'Live — occupancy up, RATES RUNNING LOW', warn:true },
+      { k:'Churn driver', v:'Owners SELLING, not leaving for competitors', warn:true },
+      { k:'Key-man risk', v:'Danny holds Ancient City owner relationships', warn:true },
+      { k:'Untapped EBITDA', v:'~$500–600K — scale, laundry, cleaning, SuiteOp' },
+      { k:'GMs in seat', v:'Ashley (JE) · Scott (AC, ex-Vacasa/LFR)' },
+      { k:'Done already', v:'Guesty, Conduit, SuiteOp, Breezeway, new website' },
+    ],
+    horizons:{
+      30:[
+        { id:'b-30n-1', t:'Brand deck filled out', who:'Andrew + Danny', n:'Nuts and bolts, strengths, weaknesses, areas to improve — to surface cross-brand opportunities.' },
+        { id:'b-30n-2', t:'In-person visit, July 29–31', who:'Andrew', n:'Andrew coordinates with Riley. Chris, Riley, Dustin, Andrew, Danny. Whiteboard session at the facilities.' },
+        { id:'b-30n-3', t:'OTAmiser rate accountability cadence stood up', w:1, n:'Occupancy-driven strategy must not sacrifice rate. This is the guardrail — 30North is the live test case for the whole portfolio.' },
+        { id:'b-30n-4', t:'Establish the actual take rate', n:'Not formally tracked today. Step one is simply knowing the number.' },
+        { id:'b-30n-5', t:'Confirm GM + PM comp plans live', n:'PM plan live June 1 (Ancient City). JE PM plan + both GM plans roll July 1.' },
+        { id:'b-30n-6', t:'Churn split: owner-sale vs. service', n:'Feed into Luke\u2019s cross-brand baseline. Rates, insurance, taxes up; ADRs soft — owners are exiting the asset.' },
+      ],
+      60:[
+        { id:'b-30n-7', t:'Laundry in-house business case', m:'$1.25/lb today', n:'Scott built laundry programs at Vacasa and LFR. Andrew has capex/machinery background.' },
+        { id:'b-30n-8', t:'Cleaning in-house business case', m:'~$2M fee income', n:'15–20 third-party teams today. Largest single margin opportunity in the brand.' },
+        { id:'b-30n-9', t:'Quarterly maintenance plan launched', m:'~$250K', n:'$199/qtr × ~320 listings. Treat maintenance as a profit center: 30% net margin target, bonus above.' },
+        { id:'b-30n-10', t:'Take-rate path chosen: 10% → 15%', n:'Pick from the cross-brand lever menu. Damage waiver, billable labor rate, deep-clean programs, consumables at scale.' },
+        { id:'b-30n-11', t:'Danny key-man transition plan started', w:1, n:'12–18 month runway. Owner relationships must survive him.' },
+        { id:'b-30n-12', t:'Scorecard, meeting cadence, role ownership formalized', n:'Across the merged brand. KPIs already defined: guest services, churn, maintenance, cleaning rating, profitability, owner acquisition.' },
+      ],
+      90:[
+        { id:'b-30n-13', t:'Owner CRM stood up', n:'Real-time owner touches, statement views, profitability per property. Goal: a data-backed "intentional churn" narrative for buyers.' },
+        { id:'b-30n-14', t:'Nomad integration plan', n:'60 condos. Plus the smaller tuck-ins.' },
+        { id:'b-30n-15', t:'Ancient City guest-side marketing built', n:'Historically word-of-mouth and realtor referrals only. Andrew is the marketing strength — this is the clearest cross-pollination win.' },
+        { id:'b-30n-16', t:'2027 revenue + take-rate goals set' },
+        { id:'b-30n-17', t:'Brand initiatives migrated to STAYD level' },
+      ],
+    }
+  },
+  {
+    key:'beachside', name:'Beachside VR', rich:true,
+    note:'Cookie (ops, joined December) + Stephen (revenue, training, systems). We slotted this brand as the RECIPIENT of a guest-services training pilot. It is not. Stephen has already built the training infrastructure the rest of the portfolio needs — and Beachside is quietly the closest thing STAYD has to an R&D function.',
+    signals:[
+      { k:'Training hub', v:'Built in Claude Code — role modules, certification' },
+      { k:'AI role-play', v:'Gemini simulates guests + owners for agent practice' },
+      { k:'Owner materials', v:'Owner-relations handbook + onboarding revenue sheet' },
+      { k:'Refund tracking', v:'By CATEGORY — the instrument nobody else has' },
+      { k:'Ops dashboard', v:'Cookie built her own KPI tracker' },
+      { k:'Permissions', v:'Multi-company admin layer built — NOT implemented' },
+      { k:'OTAmiser', v:'Working. Revenue up YoY. They do the ranking work.' },
+      { k:'Corporate housing', v:'Blue Origin — 2–8 staff, 12-month leases' },
+      { k:'Agent churn', v:'6–8 months cycling through agents', warn:true },
+      { k:'Conduit', v:'"Free-for-all" — forces splitting people up', warn:true },
+      { k:'Scope of work', v:'Nobody has one. Everyone pitches in.', warn:true },
+      { k:'Cleaning', v:'Cleaners good. Losing the cleaning manager.', warn:true },
+      { k:'Inspections', v:'Believe in them: pay up front vs. refund + bad review' },
+      { k:'Also runs', v:'Stephen was doing Host2Coast + Stay Texas revenue' },
+    ],
+    horizons:{
+      30:[
+        { id:'b-bsd-1', t:'Stop treating Beachside as a pilot site. It is the build site.', b:1, w:1, n:'The guest-services training test case we planned is already built here, better than we would have built it. Reposition: Beachside SHIPS the training system to the other seven.' },
+        { id:'b-bsd-4', t:'Run the refund-category analysis and settle the inspection question', b:1, w:1, n:'Refund cost avoided vs. inspection cost. They already track refunds by category and maintenance-ticket revenue impact. Haven cut inspections and held scores but never measured this. Host2Coast spends $175K/yr. Cheapest, highest-leverage analysis on the entire board.' },
+        { id:'b-bsd-5', t:'Give Cookie and Stephen scopes of work', b:1, n:'Their own words: nobody has one, everyone pitches in. The two people building the most valuable infrastructure in the portfolio have no defined role. That is how you lose them.' },
+        { id:'b-bsd-6', t:'Fix the agent-retention problem', w:1, n:'6–8 months of cycling through agents and retraining. Riley\u2019s instinct to pay more to keep people is probably right — but Ana\u2019s training is about to go live and they want to set the remote-team standard. Retention is the precondition for that, not a nice-to-have.' },
+        { id:'b-bsd-7', t:'Backfill the cleaning manager' },
+      ],
+      60:[
+        { id:'b-bsd-2', t:'Training hub packaged and shipped to brand #2', w:1, n:'Load it with what is already queued: Luke\u2019s owner-relations curriculum, Haven\u2019s service recovery, Conduit KPI training, Host2Coast\u2019s hospitality standard. Blue Gems is the obvious first recipient — they have the burning review score.' },
+        { id:'b-bsd-8', t:'Implement the multi-company permissions layer', n:'Built, not deployed. It is the access model STAYD needs to run eight brands from one system.' },
+        { id:'b-bsd-9', t:'Owner onboarding revenue sheet finished and standardized', n:'Stephen\u2019s draft. Most owners do not understand the pricing model or how reviews and visibility drive revenue. Given that a large share of owners across the portfolio are cash-flow negative, teaching them how the machine works is a churn defense in itself.' },
+        { id:'b-bsd-10', t:'Stephen + Haven + Michael = the AI function', n:'Three brands independently building agent architecture. Stop them from building it three times.' },
+        { id:'b-bsd-11', t:'Lovable → Claude Code migration', n:'They flagged the integration as potentially tricky. Michael should own this, not Stephen.' },
+      ],
+      90:[
+        { id:'b-bsd-3', t:'Training system live across all 8 brands', n:'The original plan said "proven template exported." That was right — we just had the wrong template and the wrong direction of travel.' },
+        { id:'b-bsd-12', t:'Guest services centralization — gated on policy standardization', b:1, n:'Riley\u2019s 6-month target. Stephen says it is tough and he is right: standardize policies first or agents cannot hold it. That prerequisite has no owner today.' },
+        { id:'b-bsd-13', t:'Corporate housing playbook handed to Renjoy', n:'Blue Origin is the proof. Renjoy has the DOD demand and never launched.' },
+        { id:'b-bsd-14', t:'2027 revenue goals set' },
+      ],
+    }
+  },
+  {
+    key:'renjoy', name:'Renjoy', rich:true,
+    note:'Luke (owner relations + sales) · Michael (tech) · Jacob (deals). Founded 2021–22 out of a mastermind group; ~200 units in three years. Growth was never the problem — people, housekeeping, maintenance and culture were. New Ops Director (home-services background, blue collar) on a 3–6 month track to GM, after which the founders have no operating role.',
+    signals:[
+      { k:'Damage waiver', v:'$200K in 12 months — started mid-June' },
+      { k:'Upsells', v:'$150K — early/late checkout + pet fees' },
+      { k:'Channel', v:'60% Airbnb · 5% direct — LOWEST direct in group', warn:true },
+      { k:'Housekeeping', v:'1099 → W2 @ $19–20/hr: −$100K → +$100K/yr' },
+      { k:'HK leakage', v:'"A housekeeping business operating as a rental company"', warn:true },
+      { k:'Maintenance', v:'$25–30/hr cost, bills $90, BREAKS EVEN — deliberate', warn:true },
+      { k:'Maint. churn', v:'6–7 handymen, revolving door' },
+      { k:'Rev mgmt', v:'Degraded 3–6 mo — Michael stepped off, no floors', warn:true },
+      { k:'Churn', v:'Up in last 6 mo · 15 lost to self-manage or sale', warn:true },
+      { k:'Growth lever', v:'Tuck-ins + M&A · LOI out on a 30-unit company' },
+      { k:'Guest journey', v:'"It\u2019s a mess and they need help with it"' },
+      { k:'Services biz', v:'Rev mgmt, guest services + HK sold AS SERVICES' },
+      { k:'Demand', v:'Military / DOD heavy · corporate housing never kicked off' },
+      { k:'Tooling', v:'Shiny-tool syndrome → now cutting, building own' },
+      { k:'STAYD roles', v:'Luke → owner relations · Michael → IT/tech · Jacob → deals' },
+    ],
+    horizons:{
+      30:[
+        { id:'b-rnj-1', t:'Resurrect Luke\u2019s owner-relations prototype', b:1, w:1, n:'He already built it: every owner call/email/text logged through Conduit, sentiment pulled, churn risk made measurable. Shelved when AI leapt. This IS the churn baseline we asked him for — do not let him start over.' },
+        { id:'b-rnj-4', t:'Ops Director: is he effective, and is he the right fit for GM?', b:1, n:'The founders\u2019 own stated worry. He runs day-to-day and puts out fires; he will NOT drive integration. If he works, the founders hand over and move to integration and tuck-ins. If he does not, everything else here stalls.' },
+        { id:'b-rnj-5', t:'Diagnose the revenue-management decay', w:1, n:'Michael was strong at it and stepped off two years ago; Reid moved to marketing. Last 3–6 months pricing has slipped — no floors, no comprehensive approach to rate vs. occupancy, declining quality of intelligence. They have no data to prove it. Get Key Data in and quantify.' },
+        { id:'b-rnj-6', t:'Route Jacob\u2019s succession and comp questions to Aidan/Riley', n:'Owner compensation, 2026 P&L, founder exit timing, salaries. Not a COO call.' },
+        { id:'b-rnj-7', t:'Restate take rate on the standard definition' },
+      ],
+      60:[
+        { id:'b-rnj-2', t:'Guest journey buildout — they asked for help by name', w:1, n:'Their words: it is a mess. They also have a $150K upsell run-rate already. Fix the journey and that number should move. Good candidate for the STAYD standard journey\u2019s second install.' },
+        { id:'b-rnj-8', t:'Audit the maintenance break-even', b:1, n:'$90 billed on $25–30 labor should be ~67% gross margin. Break-even means utilization, dispatch or the revolving door is eating it. Separate the STRATEGIC choice (protect owners) from the OPERATIONAL leakage — they are not the same thing and only one is admirable.' },
+        { id:'b-rnj-9', t:'Housekeeping margin: close the leakage', n:'Their own diagnosis — a housekeeping business operating as a rental company, losing time and efficiency. They want to revisit piece rate. This is the largest ops margin item in the brand.' },
+        { id:'b-rnj-10', t:'Brief 30North on the W2 conversion', m:'$200K swing', n:'Including the part that did not work: culture, purpose, growth.' },
+        { id:'b-rnj-11', t:'Hand the services-as-a-service line to Jack', n:'Rev mgmt, guest services and HK sold outside their market. Real B2B revenue that nobody at STAYD is tracking.' },
+        { id:'b-rnj-12', t:'Corporate housing / DOD: why did it never kick off?', n:'Heavy military demand, too far from ski. They had StayFi, dropped it, then rebuilt it. There is a demand segment here they have never worked.' },
+      ],
+      90:[
+        { id:'b-rnj-3', t:'Owner Relations operating cross-brand, Luke leading', n:'Training calls for every brand. Centralized at the STAYD level.' },
+        { id:'b-rnj-13', t:'Ops Director confirmed as GM; founders out of operating roles' },
+        { id:'b-rnj-14', t:'Growth engine backed: tuck-ins + the 30-unit LOI', n:'Their biggest lever by their own assessment — margin improves with every unit added.' },
+        { id:'b-rnj-15', t:'2027 revenue + margin goals set' },
+      ],
+    }
+  },
+  {
+    key:'bigfish', name:'Big Fish', rich:true,
+    note:'Chad. Myrtle Beach. Highest-volume brand in the portfolio — a booking every 2–3 minutes. Already on Guesty. The most operationally mature brand we\u2019ve looked at, and the one with the most exportable plays.',
+    signals:[
+      { k:'Revenue', v:'$497K (2026) · $279K (2022) · ~10% YoY' },
+      { k:'Bookings', v:'~30,000/yr — one every 2–3 minutes' },
+      { k:'Properties', v:'520–530 active · ~600 incl. on/offboarding' },
+      { k:'Commission', v:'20% vs. competitors at 40% — THE moat', warn:true },
+      { k:'Damage waiver', v:'$19–$49 tiered, no opt-out, ~99% to bottom line' },
+      { k:'Channel mix', v:'Airbnb 50–60% · direct 12% · VRBO growing' },
+      { k:'VRBO ads', v:'$6K spend → $150–200K bookings' },
+      { k:'Pricing', v:'PriceLabs → OTAmiser MID-AUGUST', warn:true },
+      { k:'Chad\u2019s challenge', v:'OTAmiser must beat him by 10%', warn:true },
+      { k:'Churn', v:'~10% chronic "jumpers" · rest stay 10–12 yrs' },
+      { k:'Targets', v:'$3M EBITDA · $40M exit' },
+      { k:'Owned units', v:'~20 Big Fish-owned, same commission structure' },
+    ],
+    horizons:{
+      30:[
+        { id:'b-bgf-1', t:'Capture the pre-switch PriceLabs baseline', b:1, w:1, n:'HARD DEADLINE — mid-August. Occupancy, ADR, RevPAR by unit group. Without this, Chad\u2019s 10% challenge cannot be adjudicated and the best OTAmiser proof point in the portfolio is lost.' },
+        { id:'b-bgf-2', t:'Build internal pace + unit-performance reporting', who:'Chris', n:'From the transcript. Checks and balances alongside OTAmiser so it drives BOTH occupancy and rate.' },
+        { id:'b-bgf-3', t:'Join all OTAmiser rollout calls', who:'Chris', n:'Already reached out.' },
+        { id:'b-bgf-4', t:'Resolve: fee increase vs. the 20% moat', b:1, n:'~$100K on 30,000 turns is real money. So is the acquisition pitch it would undercut. Riley + Chad decision, not a spreadsheet exercise.' },
+        { id:'b-bgf-5', t:'Reconcile the financials', w:1, n:'$497K revenue and a $3M EBITDA target do not reconcile as stated. Confirm the units and the basis before this feeds 2027 goal-setting.' },
+      ],
+      60:[
+        { id:'b-bgf-6', t:'OTAmiser vs. Chad — head-to-head result published', n:'The 10% bar. Whatever the answer, it is the most credible read on the tool we will get.' },
+        { id:'b-bgf-7', t:'Damage waiver mechanics documented for portfolio export', m:'~99% margin', n:'Tiering, no-opt-out wrap, payout policy, the $10 cleaner credit. Hand to the other seven.' },
+        { id:'b-bgf-8', t:'VRBO ad program documented and scaled', n:'$3–5/ad. Establish whether the return holds at higher spend before exporting it.' },
+        { id:'b-bgf-9', t:'Confirm remaining STAYD stack gaps', n:'Guesty is already in place. Establish what is actually missing — Key Data, Conduit, Wheelhouse — rather than assuming a full integration is needed.' },
+        { id:'b-bgf-10', t:'Owner pricing education: room rates, not gross booking value', n:'Chad\u2019s framing. Most owners give full pricing control; some set minimums.' },
+      ],
+      90:[
+        { id:'b-bgf-11', t:'Fee decision executed — increase, or moat protected and documented' },
+        { id:'b-bgf-12', t:'2027 revenue + EBITDA goals set', n:'Against the $3M EBITDA / $40M exit target.' },
+        { id:'b-bgf-13', t:'Linen ownership model exported to brands that don\u2019t have it' },
+        { id:'b-bgf-14', t:'Jumper churn addressed', n:'~10% of owners are chronic switchers leaving over small irritations. Cheapest retention win available.' },
+      ],
+    }
+  },
+  {
+    key:'host2coast', name:'Host2Coast', rich:true,
+    note:'Never been profitable — but this is a breakout year, and he values being in the group at ~$500K EBITDA even without a sale. Turned down an outside offer that was too rich at the time while talking to Riley. Rolled in a company last October (~$800K revenue). The brand we are asking the most of, and the one whose biggest problem we have not yet solved.',
+    signals:[
+      { k:'Take rate', v:'45% — at the wall Stay Texas already hit', warn:true },
+      { k:'HK margin', v:'13% · Riley says it should be 30%', warn:true },
+      { k:'Amenity fee', v:'$125 × ~5,000 arrivals = $625K collected' },
+      { k:'Amenity spend', v:'~$325K amenities + $175K inspections' },
+      { k:'Amenity net', v:'"At best $200K" — a 20–32% margin', warn:true },
+      { k:'Damage fee', v:'Pure profit — 4th brand to confirm the lever' },
+      { k:'Mgmt fee', v:'Goes toward salaries' },
+      { k:'BIGGEST ISSUE', v:'Accounting uncertainty. NetSuite keeps slipping.', warn:true },
+      { k:'Bookkeeping', v:'His son, in Topkey. Coming off a bad experience.' },
+      { k:'Hospitality', v:'The differentiator — full amenity program, inspectors' },
+      { k:'CAC', v:'Low — realtors call HIM. Owners like the office.' },
+      { k:'Conduit', v:'Making them nervous', warn:true },
+      { k:'Consultants', v:'Al → Brad (ex-Abode, works with OTAmiser). Needed?' },
+      { k:'Planning', v:'Keeps a detailed pro forma — usable data' },
+    ],
+    horizons:{
+      30:[
+        { id:'b-h2c-1', t:'Deliver the accounting / NetSuite plan', b:1, w:1, n:'His words, not ours: this is his biggest issue. He is going to keep generating revenue regardless — but the uncertainty is corrosive and it is entirely within our power to remove. Aidan owns it, Blue Gems is already building it. Tell him the plan and what to do in the meantime. Do this before asking him for anything.' },
+        { id:'b-h2c-4', t:'Measure what share of his owners are cash-flow negative', b:1, w:1, n:'Haven says 85%. Until we know H2C\u2019s number, the fee increase is a shot in the dark aimed at the brand with a 45% take rate and no profitability history.' },
+        { id:'b-h2c-5', t:'Get the real amenity-program P&L', n:'$625K in, ~$500K out by his own figures, and he says it nets "at best $200K." The arithmetic does not close. Find the truth — there may be $100K+ sitting in the gap.' },
+        { id:'b-h2c-6', t:'Restate take rate on the standard definition', b:1, n:'45% clusters with Stay Texas (48%), not with 30North (10%) or Big Fish (20%). This brand is half the reason we know the metric is broken.' },
+        { id:'b-h2c-7', t:'Consultant question: is Brad still needed?', n:'Al brought in Brad (ex-Abode) who works with OTAmiser. He met Stephen and did not click; Rachel likes Brad. Now that OTAmiser is coming through STAYD, he is asking whether he needs the consultant at all. Answer him.' },
+        { id:'b-h2c-8', t:'Address the Conduit nervousness', n:'Change-load again. Do not stack it on top of accounting uncertainty.' },
+      ],
+      60:[
+        { id:'b-h2c-2', t:'Housekeeping margin: 13% → 30%', b:1, w:1, m:'the real prize', n:'The largest identified margin gap in the portfolio. No owner conversation required. This is where the $300K actually lives — not in the fee.' },
+        { id:'b-h2c-9', t:'Amenity margin repair', n:'The program works and drives low CAC. It is the execution economics that leak. He has already swapped inspectors for stagers doing amenities and flowers — finish the job.' },
+        { id:'b-h2c-10', t:'Test the $175K inspection line against Haven\u2019s model', w:1, n:'Haven runs zero dedicated inspectors and holds their scores. H2C spends $175K. BUT: hospitality is H2C\u2019s actual differentiator in a way it was not at Haven. Test carefully — this is the one place where cutting inspections could cost more than it saves.' },
+        { id:'b-h2c-11', t:'Fee increase — only if it beats the margin path', n:'It may still win. It should have to win.' },
+        { id:'b-h2c-12', t:'Org chart mapped', n:'Original workstream. Still needed — and now informed by where the margin actually leaks.' },
+      ],
+      90:[
+        { id:'b-h2c-3', t:'$300K delivered — from margin, from fee, or from both', n:'The number was never the question. The route to it was.' },
+        { id:'b-h2c-13', t:'Hospitality playbook exported to the portfolio', n:'Full-size amenities, black makeup towels, canvas totes, cookies, koozies, orange beach towels, handwritten notes, fresh flowers, toolbox under the sink. Haven is weak exactly where H2C is strong.' },
+        { id:'b-h2c-14', t:'2027 revenue + EBITDA goals set', n:'Against the ~$500K EBITDA value of group membership he already recognizes.' },
+      ],
+    }
+  },
+  {
+    key:'bluegems', name:'Blue Gems', rich:true,
+    note:'Aidan (ops, also STAYD CFO) + JB (growth). Julie not involved. Orlando/Disney, expanded into Clearwater and Vero Beach because owners cannot make the numbers work in Disney. Highest bedroom count per home in the portfolio. Leading the NetSuite build.',
+    signals:[
+      { k:'GBV', v:'$8.1M' },
+      { k:'Portfolio', v:'190 homes / ~1,000 bedrooms — figures conflict, see 30d', warn:true },
+      { k:'Markets', v:'~140 Disney · 25 Clearwater · small Vero Beach' },
+      { k:'Review score', v:'4.6 → 4.3 · target 4.7 — THE pain point', warn:true },
+      { k:'Root cause', v:'No accountability for maintenance results or QA', warn:true },
+      { k:'The gap', v:'Remote team + maintenance team, no bridge between them', warn:true },
+      { k:'Churn', v:'~1 home/month — owners not making money' },
+      { k:'Maintenance', v:'In-house · 6.5 FT techs · pool service in-house' },
+      { k:'Ops model', v:'3 coordinators dispatching · NO property manager role' },
+      { k:'Growth', v:'JB signed 72 last year · 3 BD reps now avg ~3/mo each' },
+      { k:'Direct economics', v:'Only ~20% capture — Aidan questions if it pays', warn:true },
+      { k:'Demand', v:'Groups: travel agencies, AAU baseball. Not individuals.' },
+      { k:'Blueprint', v:'Reno + design + turnkey STR, sold as separate fee' },
+      { k:'Stack', v:'Guesty · Topkey · internal ops + review-mgmt apps' },
+      { k:'Accounting', v:'Strongest in group · leading NetSuite · 2 accountants' },
+    ],
+    horizons:{
+      30:[
+        { id:'b-blg-1', t:'Define and hire the local ops layer', b:1, w:1, n:'Not a GM slapped on the existing structure. The missing role is boots-on-the-ground property management bridging the remote team and the maintenance team. Write the role, then hire it.' },
+        { id:'b-blg-4', t:'Review score recovery plan: 4.3 → 4.7', b:1, n:'Aidan already named the cause: no accountability for maintenance results or QA. This is not a diagnosis problem, it is an installation problem.' },
+        { id:'b-blg-5', t:'Reconcile the portfolio figures', w:1, n:'Notes show 190 homes AND 156 live + 30 pipeline, and an $9M Host2Coast GBV appears mid-thread. Pin down which numbers belong to Blue Gems before any of this feeds 2027 goals.' },
+        { id:'b-blg-6', t:'Tell the Blue Gems team what STAYD is', n:'Aidan says they do not know. Start here — every other rollout depends on it.' },
+        { id:'b-blg-7', t:'Restate take rate on the standard definition', n:'Feeds the portfolio definition fix.' },
+      ],
+      60:[
+        { id:'b-blg-2', t:'QA + maintenance accountability installed — SECOND SITE after Beachside', w:1, n:'Beachside is the QA test case. Blue Gems is the brand with a burning reason to accept it and a number (4.3) to prove it worked. Run them in sequence, not in parallel.' },
+        { id:'b-blg-8', t:'Direct-booking economics modeled for this brand', n:'~20% capture. Aidan\u2019s challenge deserves a real answer, not a slogan. Ad cost per direct booking vs. OTA commission avoided.' },
+        { id:'b-blg-9', t:'BD rep productivity gap addressed', n:'JB personally signed 72 contracts last year. The 3 reps hired to replicate that average ~3/mo each. Either the expectation or the enablement is wrong — find out which.' },
+        { id:'b-blg-10', t:'Blueprint documented as an exportable product', w:1, n:'Reno/design/PM/turnkey as a separate fee line. This is the only direct answer to sale-driven churn anywhere in the portfolio. Package it.' },
+        { id:'b-blg-11', t:'Topkey: keep, replace, or absorb', n:'Not part of the STAYD stack. Decide before NetSuite lands.' },
+        { id:'b-blg-12', t:'Address the overstaffing honestly', n:'They know they are overstaffed, attributed to renovation work. Confirm whether that is temporary or structural.' },
+      ],
+      90:[
+        { id:'b-blg-3', t:'Review score at or above 4.7', n:'The single clearest measurable in any brand. If the QA system works, this number moves. If it does not move, the system did not work.' },
+        { id:'b-blg-13', t:'NetSuite pilot → template for the other seven', n:'Aidan is leading it and this is the strongest accounting function in the group. Whatever they build becomes the pattern.' },
+        { id:'b-blg-14', t:'2027 revenue + take-rate goals set' },
+        { id:'b-blg-15', t:'"Too much data, nobody acting on it" resolved', n:'Their words. The constraint here has never been information — it is execution on the ground. Do not solve it with another dashboard.' },
+      ],
+    }
+  },
+  {
+    key:'staytexas', name:'Stay Texas', rich:true,
+    note:'Matt (owner) + Wesley (new GM, ex-finance controller). Fredericksburg, TX — "little Napa," 200+ wineries, Hill Country escape from Austin/San Antonio/Houston. Formerly Cozi VR. Grew 0 → 300 units in ~3 years; growth was never the hard part. 2025 nearly broke them.',
+    signals:[
+      { k:'Direct bookings', v:'84% — highest in the portfolio by far', warn:true },
+      { k:'Take rate', v:'~48%, down from ~53%, targeting LOWER', warn:true },
+      { k:'Portfolio', v:'275+ homes · plus RV parks & tiny-home communities' },
+      { k:'Operating system', v:'EOS for ~4 years — rocks, cascaded metrics, open SOPs' },
+      { k:'2025 damage', v:'Lost Airbnb Superhost — first time since 2013', warn:true },
+      { k:'The sprint', v:'Track→Guesty + Breezeway + rebrand in 90 days', warn:true },
+      { k:'Leadership', v:'Wesley now GM; external GM hire failed at 90–120 days' },
+      { k:'H2B labor', v:'4 yrs, 20+ seasonal workers. Paused. Offered to holdco.' },
+      { k:'Channels', v:'Airbnb, VRBO, Booking, Expedia + Vacay aggregator' },
+      { k:'Q3 rock', v:'Drop Vacay Home Connect → direct Guesty connections' },
+      { k:'Slow seasons', v:'Jul 15–Sep 15 (heat) · Jan–Feb' },
+      { k:'Peak', v:'Oktoberfest (pop. +20–25K) · Christmas' },
+      { k:'Matt\u2019s ask', v:'Benchmarking + EBITDA, not more software', warn:true },
+    ],
+    horizons:{
+      30:[
+        { id:'b-stx-1', t:'Stand up cadence reporting', who:'Chris', n:'Consistent RevPAR and pacing measurables, plus market-level metrics to hand back to owners. From the transcript.' },
+        { id:'b-stx-4', t:'Pressure-test whether OTAmiser is right for this brand', w:1, n:'Transcript lists "stand up OTA Miser for Cozi" as a next step — but 84% of reservations never touch an OTA. Confirm the OTA volume justifies it before spending the cycles. This is the brand where the tool may simply not fit.' },
+        { id:'b-stx-5', t:'Restate take rate on the standard definition', b:1, n:'~48% cannot be compared to 30North\u2019s ~10% until we know we are measuring the same thing. This brand is the reason the definition problem surfaced.' },
+        { id:'b-stx-6', t:'Set up the ongoing cadence with Matt and Wesley', who:'Chris', n:'Financial performance, benchmarking, and visibility on holdco initiatives as they roll out. Wesley is one year into STR — the finance depth is real, the industry depth is not yet.' },
+        { id:'b-stx-7', t:'Do NOT stack new software on this brand right now', b:1, w:1, n:'They are still recovering from the 90-day sprint and are bracing for NetSuite/ERP. Anything else we add has to displace something, not sit on top of it.' },
+      ],
+      60:[
+        { id:'b-stx-2', t:'Begin the value creation exercise', who:'Chris', n:'RevPAR lift, organic growth levers, housekeeping and maintenance margin, centralization candidates. From the transcript.' },
+        { id:'b-stx-8', t:'Deliver the P&L benchmark Matt is asking for', w:1, n:'Real cross-brand comparison on cleaning margin, maintenance margin, take rate. This is the thing he wants from the collective — and it is already on our list for other reasons. Ship it to him first and he becomes an ally rather than a skeptic.' },
+        { id:'b-stx-9', t:'Reconcile quality vs. EBITDA', n:'Their own framing: historically strong on quality, weak on EBITDA. That is the whole brief for this brand.' },
+        { id:'b-stx-10', t:'Support the Vacay Home Connect exit', n:'Q3 rock. Move to direct Guesty channel connections; focus on the big five (Airbnb, VRBO, Booking, Expedia, direct). Whimstay is low ROI.' },
+        { id:'b-stx-11', t:'Escalate Homes & Villas', n:'40 properties unlisted, ticket open 8 weeks, no account manager, no response. If we have any Marriott leverage at the holdco level, spend it here — it is free inventory sitting dark.' },
+        { id:'b-stx-12', t:'H2B decision for next season', n:'Reassess the program they paused. Coordinate with 30North, who need exactly this labor for in-housing cleaning and laundry.' },
+      ],
+      90:[
+        { id:'b-stx-3', t:'Deeper STAYD integration — on their timeline, not ours' },
+        { id:'b-stx-13', t:'Direct-booking playbook extracted and exported', m:'84% direct', n:'The most valuable transferable asset in this brand. Big Fish is at 12% direct. Work out what Matt did and hand it to everyone.' },
+        { id:'b-stx-14', t:'RV / tiny-home model assessed as a portfolio play', n:'First full year operating them. Guests skew semi-retired, not bound to school or holiday calendars — they fill exactly the Jul 15–Sep 15 and Jan–Feb troughs. That counter-seasonality may be worth more than the units themselves.' },
+        { id:'b-stx-15', t:'2027 revenue + EBITDA goals set' },
+      ],
+    }
+  },
+  {
+    key:'haven', name:'Haven', rich:true,
+    note:'Jack (STAYD CRO, Haven partner) + Dylan. Knoxville / Smokies — one of the most competitive markets in the country, 10K → 20K listings. Grew 20 → 240 properties in two years, ran $1.5M in the red, nearly out of cash. Cut deep, went scrappy, tripled profits in 2025 and is in the black as of this month. GM and Director of Ops promoted internally, official July 1.',
+    signals:[
+      { k:'Owners cash-flow NEGATIVE', v:'85% — the number that reframes everything', warn:true },
+      { k:'Owner email volume', v:'~400/day — needs 4+ owner-relations staff' },
+      { k:'Damage waiver + fee', v:'~$200K/yr waiver · $70–90K/MONTH combined' },
+      { k:'Waiver design', v:'OPT-OUT — and owners took it. Big Fish is mandatory.', warn:true },
+      { k:'QA inspections', v:'ELIMINATED — and scores did not drop', warn:true },
+      { k:'Rev mgmt', v:'20–30% ahead of market on 2–4BR (their sweet spot)' },
+      { k:'Key Data', v:'Accurate for their market — works here' },
+      { k:'AI ops', v:'>90% guest comms automated · agent-drafted work orders' },
+      { k:'Cleaning co.', v:'Separate company, own GM, ~$200K profit' },
+      { k:'Maintenance', v:'LOSING money · fighting to reach break-even', warn:true },
+      { k:'Direct bookings', v:'"What are those" — essentially none', warn:true },
+      { k:'Sales', v:'Best in the group. Daily role-play. Jack built it.' },
+      { k:'Weakness', v:'Service recovery — solve the problem, guest still unhappy', warn:true },
+      { k:'Growth', v:'200 → 280 properties with no net new hires' },
+      { k:'Stack', v:'Conduit · SuiteOp · Breezeway · moving to Trellis' },
+    ],
+    horizons:{
+      30:[
+        { id:'b-hvn-1', t:'Get the 85% number verified and replicated', b:1, w:1, n:'If 85% of Haven\u2019s owners are cash-flow negative, run the same cut at Host2Coast and Big Fish BEFORE the fee conversations open. This is the highest-leverage number in the portfolio.' },
+        { id:'b-hvn-4', t:'Document the QA counter-experiment properly', b:1, n:'They removed dedicated inspections and scores held. Cleaners mini-inspect; maintenance and runners inspect while on site; the cleaning company has its own inspectors going behind cleaners. Get the real mechanism written down before Beachside and Blue Gems spend money on a different one.' },
+        { id:'b-hvn-5', t:'Extract the damage waiver + damage fee structure', m:'$70–90K/mo', n:'Two layers, not one. Note the flaw to fix on export: theirs is opt-out and owners opted out. Big Fish proves mandatory works.' },
+        { id:'b-hvn-6', t:'Jack documents the Haven sales process', who:'Jack', n:'He is the CRO. This is his own asset and it is not written down.' },
+        { id:'b-hvn-7', t:'Restate take rate on the standard definition', n:'Commission + damage fee + damage waiver + SuiteOp + clean are the revenue lines; everything else is pass-through. Clean margin is hard to track and may not be positive even though the cleaning company profits.' },
+      ],
+      60:[
+        { id:'b-hvn-2', t:'AI ops architecture packaged for the portfolio', w:1, n:'Conduit → Slack agent drafts work order → human approves → agent executes → team reviews. Pair Haven with Michael (Renjoy) at the STAYD level and make this the standard rather than building something new centrally.' },
+        { id:'b-hvn-8', t:'Service recovery training built', w:1, n:'Their explicit weakness: they fix the problem but the guest stays unhappy. Build it into the Beachside guest-services training and run Haven as the second site.' },
+        { id:'b-hvn-9', t:'Maintenance: get to break-even, then decide', n:'Currently losing money. They also fell behind on owner charges and owners pushed back. Feeds the portfolio maintenance fork.' },
+        { id:'b-hvn-10', t:'Cleaning company: roll-in strategy', n:'How does a separate cleaning entity with its own GM fold into Haven and then into STAYD? They asked. Also the model 30North should see before in-housing.' },
+        { id:'b-hvn-11', t:'Trellis decision', n:'Their answer to tool disconnect. Make it a portfolio call, not a brand call.' },
+        { id:'b-hvn-12', t:'Marketing + lead gen', n:'Sales conversion is elite; the top of the funnel is not. That gap is the cheapest growth available here.' },
+      ],
+      90:[
+        { id:'b-hvn-3', t:'GM + Director of Ops measurable and scorecarded', n:'Both promoted internally, started July 1. Dylan and Jack are already out of day-to-day.' },
+        { id:'b-hvn-13', t:'Owner profitability program', w:1, n:'85% negative is not an owner-relations problem — no amount of replying fast fixes an asset that does not pencil. This is where Blue Gems Blueprint, revenue management and the ancillary lines have to converge.' },
+        { id:'b-hvn-14', t:'Tracking discipline installed under the Director of Ops', n:'Their own admission: they do not track much of this well. The new Director of Ops is how that changes.' },
+        { id:'b-hvn-15', t:'2027 revenue + margin goals set' },
+      ],
+    }
+  },
+];
+
+// Programs are composed of EXISTING item ids — checking here checks everywhere.
+const THIS_WEEK = [
+  { id:'r30-5',  t:'Tim R — VRBO enterprise meeting', n:'Walk in with Big Fish\u2019s numbers: $6K ad spend → $150–200K in bookings. A proven in-portfolio case study, not a pitch.' },
+  { id:'b-h2c-1', t:'Give Host2Coast the accounting / NetSuite plan', n:'His stated biggest problem. A call to Aidan solves it. Do this before asking him for anything — we are about to ask him for a lot.' },
+  { id:'r30-7',  t:'Resolve the fee markup retention question (JJ / Riley)', n:'Unblocks the entire fee-breakdown exercise.' },
+  { id:'r30-2',  t:'Ship pacing + market reports for brands that already have Key Data', n:'The source of truth starts paying the moment it exists.' },
+  { id:'r30-12', t:'Start the Big Fish pre-switch baseline', n:'Mid-August wall. Miss it and the best OTAmiser proof in the portfolio is gone forever.' },
+  { id:'c30-43', t:'Resolve the Luke / Stephen owner-relations overlap', n:'Two people are building the same training. One conversation stops it becoming two competing programs.' },
+];
+
+const PROGRAMS = [
+  {
+    n:'P1', key:'diag', kind:'gate', title:'Definition & Diagnosis',
+    owner:'Chris', window:'30 days — by Aug 12',
+    why:'Right now <b>no two brands measure the same thing</b>. Take rate lands in two clusters that share a word but not a definition: 30North ~10% and Big Fish 20% against Host2Coast 45% and Stay Texas 48%. Nobody sits in between. Meanwhile Haven reports <b>85% of owners cash-flow negative</b> — a number that, if it generalises, caps every fee decision in the portfolio. Until both are settled, every model downstream is guesswork wearing a spreadsheet.',
+    exit:'One page. Eight brands. Same metrics. Trusted by the people whose numbers are on it.',
+    items:['r30-16','r30-17','r30-18','c30-1','r30-1','r30-2','r30-3','b-h2c-6','b-stx-5','b-blg-7','b-rnj-7','b-hvn-7'],
+  },
+  {
+    n:'P2', key:'clock', kind:'clock', title:'The August Clock — OTAmiser proof',
+    owner:'Chris · Bartjan · Jarne',
+    window:'HARD DEADLINE — mid-August',
+    why:'Chad at Big Fish is an early PriceLabs customer who helped build their features and still prices by hand 20 minutes a day. He switches to OTAmiser <b>mid-August</b> and has set an explicit bar: beat me by 10%. That is a hostile, competent baseline — the single most credible test of the tool we will ever get. <b>It is unrunnable without a pre-switch baseline, and the window closes in about four weeks.</b> Meanwhile 30North shows occupancy up with rates running low, and Chad warns the tool is Airbnb-heavy while VRBO is his fastest channel.',
+    exit:'Baseline captured before the switch. Rate guardrail live. A defensible RevPAR lift number — or an honest admission there is not one.',
+    items:['r30-12','r30-13','b-bgf-1','r30-9','r30-10','r30-11','r60-13','r60-3','b-30n-3'],
+  },
+  {
+    n:'P3', key:'waiver', kind:'', title:'Damage Waiver Rollout',
+    owner:'Chris → GM per brand', window:'30–60 days',
+    why:'The most validated lever on the board, and it is not close. <b>Four brands run it, four confirm it independently.</b> Big Fish: tiered $19–$49, mandatory, ~99% to the bottom line. Renjoy: $200K in twelve months. Haven: a waiver AND a separate damage fee, together $70–90K/month. Host2Coast: "pure profit." Critically, it raises revenue <b>without touching owner economics</b> — so unlike a fee increase, it does not feed the sale-driven churn that is already the portfolio\u2019s biggest leak. Four brands still do not have it.',
+    exit:'Live at 8 of 8, on the strongest design: Haven\u2019s two layers + Big Fish\u2019s mandatory wrap + tiering by unit size.',
+    items:['r60-11','b-hvn-5','b-bgf-7'],
+  },
+  {
+    n:'P4', key:'margin', kind:'gate', title:'Margin Repair — this replaces the fee increases',
+    owner:'Chris · Aidan', window:'60–90 days',
+    why:'The original plan was to raise fees at Host2Coast, Big Fish and Blue Gems. Discovery says that is aimed at the wrong lever. <b>Host2Coast is already at a 45% take rate</b> — the wall Stay Texas hit at 48% and retreated from. But his $300K exists anyway, in his own P&L: <b>housekeeping margin at 13% against a 30% target</b>, a <b>$625K amenity program netting "at best $200K"</b>, and <b>$175K/yr on inspections</b> Haven proved may be unnecessary. Same money. No owner conversation, no occupancy risk, no churn risk. Big Fish is worse: his $100K would tax the 20%-vs-40% commission pitch that drives his entire acquisition engine.',
+    exit:'Margin targets per brand with a named owner. The fee increases proceed only if they beat the margin path on merit.',
+    items:['r60-4','r60-22','c30-36','c30-37','b-h2c-2','b-h2c-9','b-h2c-5','r60-5','b-bgf-4','c30-47','c30-27','c30-35','b-bsd-4','r60-20','r60-21','b-rnj-8','c30-29','b-rnj-9','c60-3'],
+  },
+  {
+    n:'P5', key:'owner', kind:'gate', title:'Owner Profitability — this replaces "churn"',
+    owner:'Luke · Chris', window:'30–90 days',
+    why:'Three brands are losing owners because <b>the asset does not pencil for the owner</b> — 30North (rates, insurance, taxes up), Blue Gems (~1 home/month, owners not making money), Renjoy (15 lost to self-management or sale). Haven puts a number on it: <b>85% of their owners are cash-flow negative</b>, which is why they field 400 emails a day and need four people to answer them. <b>Retention tactics do not touch this.</b> No amount of replying fast fixes an asset that loses money. And Luke is not starting from zero — he already built the sentiment and churn-risk prototype on top of Conduit, then shelved it.',
+    exit:'Churn categorised (sale / self-manage / jumper / service). Luke\u2019s tool resurrected. Blue Gems Blueprint offered at 2+ brands.',
+    items:['c30-7','c30-10','c30-18','c30-22','b-rnj-1','c30-19','b-blg-10','b-hvn-1','b-h2c-4','b-hvn-13','b-bsd-9','c60-4','c60-5','c60-8'],
+  },
+  {
+    n:'P6', key:'exchange', kind:'', title:'The Exchange — ship what already works',
+    owner:'Stephen · Chris', window:'60–90 days',
+    why:'This is the finding that should change the plan. <b>Every brand has already solved something another brand is struggling with, and none of them know it.</b> Big Fish has the damage waiver, VRBO ads at 25–33x, the linen model and a postcard channel. 30North has the take-rate lever set. Stay Texas has 84% direct, EOS and a paused H2B labour programme. Blue Gems has Blueprint and NetSuite. Renjoy has the W2 conversion and the owner tool. Haven has the AI ops stack. <b>And Beachside built the delivery system</b> — Stephen\u2019s Claude Code training hub with Gemini role-play, which is exactly what every queued curriculum in this plan has been missing. Two founders (Matt, Jacob) have separately asked for cross-brand P&L benchmarking, unprompted.',
+    exit:'Hub live at brand #2 (Blue Gems). Five named matches executed. P&L benchmark shipped to the two founders who asked.',
+    items:['c30-15','c30-42','c30-43','c30-44','b-bsd-1','b-bsd-2','c30-25','c30-16','c30-23','c30-48','r30-14','r30-15','c30-33','c30-34','c30-38','c30-30','c30-31','b-hvn-2','c30-45','b-bsd-8','c30-26'],
+  },
+  {
+    n:'P7', key:'seq', kind:'gate', title:'Sequencing Discipline — the guardrail',
+    owner:'Chris', window:'Ongoing, starts now',
+    why:'Matt at Stay Texas migrated PMS, onboarded Breezeway and rebranded <b>in a single 90-day sprint</b>. It cost him software failure after software failure, his focus on guests and owners, and <b>Airbnb Superhost status for the first time since 2013</b>. His explicit concern about the holdco is too many launches at once. <b>We are currently planning Guesty, OTAmiser, Conduit, Key Data, NetSuite, guest journey, QA and comp plans — across eight brands.</b> Host2Coast is nervous about Conduit while drowning in accounting uncertainty. Blue Gems does not know what STAYD is. Riley wants guest services centralised in six months, which cannot happen until policies are standardised — a prerequisite currently owned by nobody.',
+    exit:'Every brand knows what is landing, when, and it is never more than two things at once.',
+    items:['c30-13','c30-14','c30-46','c30-20','c30-21','b-h2c-1','b-h2c-8','b-stx-7','c30-41','c30-32','c30-40','c30-24','b-bsd-5','b-bsd-6'],
+  },
+];
+
+let state = load();
+let filters = { seat:'prog', hz:'all', done:'all' };
+let activeBrand = '30north';
+
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; } }
+function save(){
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+    const s = document.getElementById('saved');
+    s.classList.add('show');
+    clearTimeout(window._st);
+    window._st = setTimeout(()=>s.classList.remove('show'), 900);
+  } catch(e){ alert('Could not save to this browser. Use Export progress instead.'); }
+}
+
+function seatItems(seat){
+  const seats = seat ? [seat] : ['rev','coo'];
+  const out = [];
+  seats.forEach(s=>Object.keys(DATA[s].horizons).forEach(h=>
+    DATA[s].horizons[h].forEach(g=>g.items.forEach(i=>out.push({...i, seat:s, hz:h})))));
+  return out;
+}
+function brandItems(b){
+  const out = [];
+  const list = b ? [b] : BRANDS;
+  list.forEach(br=>Object.keys(br.horizons).forEach(h=>
+    br.horizons[h].forEach(i=>out.push({...i, hz:h, brand:br.key}))));
+  return out;
+}
+function tags(i){
+  return (i.m?`<span class="money">${i.m}</span>`:'')
+       + (i.b?`<span class="blocker">BLOCKER</span>`:'')
+       + (i.w?`<span class="watch">WATCH</span>`:'')
+       + (i.who?`<span class="who">${i.who}</span>`:'');
+}
+function itemLi(i){
+  const ck = !!state[i.id];
+  return `<li class="item ${ck?'checked':''}">
+    <input type="checkbox" ${ck?'checked':''} onchange="toggle('${i.id}')">
+    <div class="txt"><div class="t">${i.t}${tags(i)}</div>${i.n?`<div class="n">${i.n}</div>`:''}</div>
+  </li>`;
+}
+
+function renderRollup(){
+  const cards = [];
+  ['rev','coo'].forEach(s=>{
+    const it = seatItems(s);
+    cards.push({ lbl:DATA[s].name, done:it.filter(i=>state[i.id]).length, total:it.length });
+  });
+  ['30','60','90'].forEach(h=>{
+    const it = [...seatItems(), ...brandItems()].filter(i=>String(i.hz)===h);
+    cards.push({ lbl:h+' days — '+DUE[h], done:it.filter(i=>state[i.id]).length, total:it.length });
+  });
+  document.getElementById('rollup').innerHTML = cards.map(c=>{
+    const pct = c.total ? Math.round(c.done/c.total*100) : 0;
+    return `<div class="stat ${pct===100?'done':''}"><div class="lbl">${c.lbl}</div>
+      <div class="num">${c.done}<span>/${c.total}</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div></div>`;
+  }).join('');
+}
+
+// Flat index of every item by id, so programs can reference them.
+function allIndex(){
+  const idx = {};
+  ['rev','coo'].forEach(s=>Object.keys(DATA[s].horizons).forEach(h=>
+    DATA[s].horizons[h].forEach(g=>g.items.forEach(i=>idx[i.id]={...i, hz:h, src:DATA[s].name}))));
+  BRANDS.forEach(b=>Object.keys(b.horizons).forEach(h=>
+    b.horizons[h].forEach(i=>idx[i.id]={...i, hz:h, src:b.name})));
+  return idx;
+}
+const IDX = allIndex();
+
+function renderThisWeek(){
+  const rows = THIS_WEEK.map(w=>{
+    const ck = !!state[w.id];
+    return `<li class="${ck?'checked':''}">
+      <input type="checkbox" ${ck?'checked':''} onchange="toggle('${w.id}')">
+      <div><div class="wt">${w.t}</div><div class="wn">${w.n}</div></div></li>`;
+  }).join('');
+  const d = THIS_WEEK.filter(w=>state[w.id]).length;
+  document.getElementById('thisWeek').innerHTML = `<div class="week">
+    <h3>This week</h3>
+    <div class="wsub">Six things. Four of them cost a phone call. ${d}/${THIS_WEEK.length} done.</div>
+    <ul>${rows}</ul></div>`;
+}
+
+function renderPrograms(){
+  document.getElementById('programs').innerHTML = PROGRAMS.map(p=>{
+    const items = p.items.map(id=>IDX[id]).filter(Boolean);
+    const done = items.filter(i=>state[i.id]).length;
+    const pct = items.length ? Math.round(done/items.length*100) : 0;
+    const vis = items.filter(i=>
+      (filters.hz==='all' || String(i.hz)===filters.hz) &&
+      (filters.done==='all' || !state[i.id]));
+    const list = vis.length
+      ? `<ul>${vis.map(i=>itemLi(i)).join('')}</ul>`
+      : `<div class="empty">Nothing open at this filter.</div>`;
+    return `<div class="prog ${p.kind}">
+      <h2>
+        <span class="pnum">${p.n}</span>
+        <span class="ptitle">${p.title}</span>
+        <span class="pct">${done}/${items.length} · ${pct}%</span>
+        <span class="pmeta"><span><b>Owner:</b> ${p.owner}</span><span><b>Window:</b> ${p.window}</span></span>
+      </h2>
+      <div class="pwhy">${p.why}</div>
+      <div class="pexit"><b>Done when:</b> ${p.exit}</div>
+      ${list}
+    </div>`;
+  }).join('');
+}
+
+function renderSeats(){
+  const host = document.getElementById('seats');
+  const bw = document.getElementById('brandWrap');
+  const pw = document.getElementById('progWrap');
+  const isBrand = filters.seat==='brand';
+  const isProg = filters.seat==='prog';
+  pw.classList.toggle('hidden', !isProg);
+  bw.classList.toggle('hidden', !isBrand);
+  host.classList.toggle('hidden', isBrand || isProg);
+  if (isProg){ renderThisWeek(); renderPrograms(); return; }
+  if (isBrand){ renderBrand(); return; }
+
+  const seats = filters.seat==='all' ? ['rev','coo'] : [filters.seat];
+  host.innerHTML = seats.map(s=>{
+    const it = seatItems(s);
+    const done = it.filter(i=>state[i.id]).length;
+    const hzs = Object.keys(DATA[s].horizons).filter(h=>filters.hz==='all' || filters.hz===h);
+    const body = hzs.map(h=>{
+      const groups = DATA[s].horizons[h].map(g=>{
+        const vis = g.items.filter(i=>filters.done==='all' || !state[i.id]);
+        if (!vis.length) return '';
+        return `<div class="cat">${g.cat}</div><ul>${vis.map(itemLi).join('')}</ul>`;
+      }).join('');
+      if (!groups.trim()) return '';
+      const hi = DATA[s].horizons[h].flatMap(g=>g.items);
+      return `<div class="horizon"><div class="hz-head">
+        <h3>${h} days</h3><span class="due">due ${DUE[h]}</span>
+        <span class="cnt">${hi.filter(i=>state[i.id]).length} of ${hi.length} done</span>
+      </div>${groups}</div>`;
+    }).join('');
+    const pct = it.length ? Math.round(done/it.length*100) : 0;
+    return `<div class="seat"><h2>${DATA[s].name}<span class="pct">${done}/${it.length} · ${pct}%</span></h2>
+      ${body || '<div class="empty">Nothing open here. Switch to Show all.</div>'}</div>`;
+  }).join('');
+}
+
+function renderBrand(){
+  document.getElementById('bnav').innerHTML = BRANDS.map(b=>{
+    const it = brandItems(b);
+    const d = it.filter(i=>state[i.id]).length;
+    return `<button class="${b.key===activeBrand?'on':''} ${b.rich?'rich':''}" onclick="pickBrand('${b.key}')">
+      <span class="dot"></span>${b.name}<span class="n">${d}/${it.length}</span></button>`;
+  }).join('');
+
+  const b = BRANDS.find(x=>x.key===activeBrand);
+  const it = brandItems(b);
+  const done = it.filter(i=>state[i.id]).length;
+  const pct = it.length ? Math.round(done/it.length*100) : 0;
+
+  const sig = b.signals ? `<div class="signals"><h4>Signals from discovery</h4><div class="sgrid">
+    ${b.signals.map(s=>`<div class="sig ${s.warn?'warn':''}"><div class="k">${s.k}</div><div class="v">${s.v}</div></div>`).join('')}
+  </div></div>` : '';
+
+  const hzs = ['30','60','90'].filter(h=>filters.hz==='all' || filters.hz===h);
+  const body = hzs.map(h=>{
+    const all = b.horizons[h] || [];
+    const vis = all.filter(i=>filters.done==='all' || !state[i.id]);
+    if (!vis.length) return '';
+    return `<div class="horizon"><div class="hz-head">
+      <h3>${h} days</h3><span class="due">due ${DUE[h]}</span>
+      <span class="cnt">${all.filter(i=>state[i.id]).length} of ${all.length} done</span>
+    </div><ul>${vis.map(i=>itemLi({...i,hz:h})).join('')}</ul></div>`;
+  }).join('');
+
+  const stub = !b.rich ? `<div class="empty"><b>Awaiting discovery transcript</b>
+    Paste this brand's Granola notes and these placeholders get replaced with real signals and action items.</div>` : '';
+
+  document.getElementById('brandPanel').innerHTML = `<div class="seat">
+    <h2>${b.name}<span class="pct">${done}/${it.length} · ${pct}%</span></h2>
+    ${b.note?`<div style="padding:13px 18px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--slate)">${b.note}</div>`:''}
+    ${sig}
+    ${body || '<div class="empty">Nothing open here. Switch to Show all.</div>'}
+    ${stub}
+  </div>`;
+}
+
+function pickBrand(k){ activeBrand = k; renderBrand(); }
+function toggle(id){ if (state[id]) delete state[id]; else state[id] = true; save(); render(); }
+function render(){ renderRollup(); renderSeats(); }
+
+document.querySelectorAll('#seatSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seatSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filters.seat=b.dataset.seat; render();
+});
+document.querySelectorAll('#hzSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#hzSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filters.hz=b.dataset.hz; render();
+});
+document.querySelectorAll('#doneSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#doneSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filters.done=b.dataset.done; render();
+});
+
+function exportJSON(){
+  const blob = new Blob([JSON.stringify({ v:2, saved:new Date().toISOString(), state }, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stayd-306090-progress-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function importJSON(e){
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try { const d = JSON.parse(r.result); state = d.state || d; save(); render(); }
+    catch(err){ alert('That file could not be read. Import the JSON exported by this page.'); }
+    e.target.value = '';
+  };
+  r.readAsText(f);
+}
+function resetAll(){
+  if (!confirm('Clear every checkbox? Export first if you want a copy.')) return;
+  state = {}; save(); render();
+}
+
+render();
+</script>
+</body>
+</html>

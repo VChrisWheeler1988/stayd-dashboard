@@ -1,39 +1,551 @@
-STAYD — 30/60/90 by Seat
-Chris (COO)  ·  Director of Revenue Management + COO tracks  ·  ladders to 2027 brand & property revenue goals
-Start Jul 13, 2026
-30 days Aug 12
-60 days Sep 11
-90 days Oct 11
-Ahead of 2027 budget season
-CRITICAL PATH
-Two gates hold up most of this list. If they slip, everything behind them slips.
-G1
-Guesty + financial access, all 8 brands — blocks take rate, HK margin, maintenance margin, fee modeling, GM measurables, brand goal setting. Target: Aug 12.
-G2
-Key Data source of truth live — blocks OTAmiser conversations, pacing/market reports, occupancy-lift baseline, fee justification. Target: this week for brands with KD access, Aug 12 for all.
-Sequencing: the OTAmiser occupancy lift is the reason the fee increases land. Baseline it in 30, open the fee conversation in 60 — not the other way around.
-All seats
-Rev Management
-COO
-By brand
-All horizons
-30
-60
-90
-Show all
-Open only
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STAYD — 30/60/90 by Seat</title>
+<style>
+  :root{
+    --navy:#0F2338;
+    --navy-2:#1B3A57;
+    --teal:#12A594;
+    --teal-dk:#0B7A6D;
+    --slate:#5A6B7B;
+    --slate-lt:#8A9AA8;
+    --line:#DDE4EA;
+    --bg:#F4F7F9;
+    --card:#FFFFFF;
+    --amber:#D98C21;
+    --red:#C0453B;
+    --green:#2E8B57;
+    --radius:6px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--navy);
+    font-family:Calibri,"Segoe UI",system-ui,-apple-system,sans-serif;
+    font-size:15px;line-height:1.45;
+  }
+  header{
+    background:var(--navy);color:#fff;padding:22px 28px 18px;
+    border-bottom:4px solid var(--teal);
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{margin:0;font-size:22px;letter-spacing:.4px;font-weight:600}
+  .sub{color:#9FB4C6;font-size:13px;margin-top:4px}
+  .dates{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .datechip{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+    padding:4px 10px;border-radius:20px;font-size:12px;color:#CFE0EC;
+  }
+  .datechip b{color:#fff}
 
-Export progress
-Import
-Print
-Reset
+  main{max-width:1180px;margin:0 auto;padding:22px 28px 70px}
 
-PER-BRAND GRID
+  /* Critical path */
+  .critical{
+    background:#fff;border-left:4px solid var(--amber);
+    border-radius:var(--radius);padding:16px 18px;margin-bottom:22px;
+    box-shadow:0 1px 3px rgba(15,35,56,.07);
+  }
+  .critical h2{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--amber)}
+  .critical p{margin:0 0 6px;font-size:14px;color:var(--navy-2)}
+  .critical .gate{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:14px}
+  .gatetag{
+    background:var(--navy);color:#fff;font-size:11px;font-weight:700;
+    padding:2px 7px;border-radius:3px;flex:none;margin-top:2px;
+  }
 
-BRAND
-30 DAYS — AUG 12
-60 DAYS — SEP 11
-90 DAYS — OCT 11
+  /* Controls */
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  .seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .seg button{
+    border:0;background:#fff;padding:8px 14px;font:inherit;font-size:13px;
+    color:var(--slate);cursor:pointer;border-right:1px solid var(--line);
+  }
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--navy);color:#fff;font-weight:600}
+  .seg button:hover:not(.on){background:#EEF3F6}
+  .spacer{flex:1}
+  .btn{
+    border:1px solid var(--line);background:#fff;color:var(--slate);
+    padding:8px 13px;border-radius:var(--radius);font:inherit;font-size:13px;cursor:pointer;
+  }
+  .btn:hover{background:#EEF3F6;color:var(--navy)}
+  .btn.danger:hover{background:#FBEDEC;color:var(--red);border-color:#E8C4C1}
 
-Progress is saved in this browser only (localStorage). Use Export progress to move it between machines, or before replacing this file.  ·  Reports up through the weekly huddle: COO block + Rev Mgmt block. Anything red two weeks running escalates to Riley.
-Saved
+  /* Progress */
+  .rollup{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:22px}
+  .stat{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:13px 15px;
+  }
+  .stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--slate-lt);font-weight:600}
+  .stat .num{font-size:24px;font-weight:700;margin:5px 0 7px;color:var(--navy)}
+  .stat .num span{font-size:14px;font-weight:400;color:var(--slate-lt)}
+  .bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--teal);transition:width .3s ease}
+  .stat.done .bar i{background:var(--green)}
+
+  /* Sections */
+  .seat{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    margin-bottom:20px;overflow:hidden;
+  }
+  .seat > h2{
+    margin:0;background:var(--navy-2);color:#fff;padding:12px 18px;
+    font-size:14px;letter-spacing:1.1px;text-transform:uppercase;font-weight:600;
+    display:flex;align-items:center;gap:10px;
+  }
+  .seat > h2 .pct{
+    margin-left:auto;font-size:12px;font-weight:400;color:#9FB4C6;letter-spacing:0;
+  }
+  .horizon{border-top:1px solid var(--line)}
+  .horizon:first-of-type{border-top:0}
+  .hz-head{
+    padding:10px 18px;background:#F7FAFB;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px;
+  }
+  .hz-head h3{margin:0;font-size:13px;font-weight:700;color:var(--navy)}
+  .hz-head .due{font-size:12px;color:var(--slate-lt)}
+  .hz-head .cnt{margin-left:auto;font-size:12px;color:var(--slate)}
+  .cat{
+    font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--teal-dk);
+    font-weight:700;padding:12px 18px 3px;
+  }
+  ul{list-style:none;margin:0;padding:0}
+  li.item{
+    display:flex;gap:11px;align-items:flex-start;
+    padding:8px 18px;border-bottom:1px solid #F0F4F6;
+  }
+  li.item:hover{background:#FAFCFD}
+  li.item input[type=checkbox]{
+    margin:3px 0 0;width:16px;height:16px;flex:none;accent-color:var(--teal);cursor:pointer;
+  }
+  li.item .txt{flex:1}
+  li.item .txt .t{color:var(--navy-2)}
+  li.item .txt .n{font-size:12.5px;color:var(--slate);margin-top:2px}
+  li.item.checked .txt .t{text-decoration:line-through;color:var(--slate-lt)}
+  li.item.checked .txt .n{color:#B4C0C9}
+  .money{
+    display:inline-block;background:#E6F5F2;color:var(--teal-dk);
+    font-size:11px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:6px;
+  }
+  .blocker{
+    display:inline-block;background:#FBEDEC;color:var(--red);
+    font-size:11px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:6px;
+  }
+
+  /* Brand table */
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{
+    background:#F7FAFB;text-align:left;padding:9px 12px;font-size:11px;
+    text-transform:uppercase;letter-spacing:.8px;color:var(--slate);
+    border-bottom:1px solid var(--line);font-weight:700;
+  }
+  td{padding:9px 12px;border-bottom:1px solid #F0F4F6;vertical-align:top;color:var(--navy-2)}
+  td.brand{font-weight:700;color:var(--navy);white-space:nowrap}
+  tr:hover td{background:#FAFCFD}
+  .bcell{display:flex;gap:8px;align-items:flex-start}
+  .bcell input{margin:2px 0 0;width:14px;height:14px;flex:none;accent-color:var(--teal);cursor:pointer}
+  .bcell.checked span{text-decoration:line-through;color:var(--slate-lt)}
+
+  footer{
+    max-width:1180px;margin:0 auto;padding:0 28px 40px;
+    font-size:12px;color:var(--slate-lt);
+  }
+  .saved{
+    position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;
+    padding:8px 14px;border-radius:var(--radius);font-size:12.5px;
+    opacity:0;transition:opacity .25s;pointer-events:none;
+  }
+  .saved.show{opacity:1}
+  .hidden{display:none !important}
+  @media (max-width:720px){
+    header,main,footer{padding-left:16px;padding-right:16px}
+    .rollup{grid-template-columns:1fr 1fr}
+    table{font-size:12.5px}
+    td,th{padding:7px 8px}
+  }
+  @media print{
+    .controls,.saved,footer{display:none}
+    body{background:#fff}
+    .seat,.stat,.critical{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>STAYD — 30/60/90 by Seat</h1>
+    <div class="sub">Chris (COO) &nbsp;·&nbsp; Director of Revenue Management + COO tracks &nbsp;·&nbsp; ladders to 2027 brand &amp; property revenue goals</div>
+    <div class="dates">
+      <div class="datechip">Start <b>Jul 13, 2026</b></div>
+      <div class="datechip">30 days <b>Aug 12</b></div>
+      <div class="datechip">60 days <b>Sep 11</b></div>
+      <div class="datechip">90 days <b>Oct 11</b></div>
+      <div class="datechip">Ahead of <b>2027 budget season</b></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="critical">
+    <h2>Critical path</h2>
+    <p>Two gates hold up most of this list. If they slip, everything behind them slips.</p>
+    <div class="gate"><span class="gatetag">G1</span><div><b>Guesty + financial access, all 8 brands</b> — blocks take rate, HK margin, maintenance margin, fee modeling, GM measurables, brand goal setting. <i>Target: Aug 12.</i></div></div>
+    <div class="gate"><span class="gatetag">G2</span><div><b>Key Data source of truth live</b> — blocks OTAmiser conversations, pacing/market reports, occupancy-lift baseline, fee justification. <i>Target: this week for brands with KD access, Aug 12 for all.</i></div></div>
+    <p style="margin-top:12px"><b>Sequencing:</b> the OTAmiser occupancy lift is the <i>reason</i> the fee increases land. Baseline it in 30, open the fee conversation in 60 — not the other way around.</p>
+  </div>
+
+  <div class="controls">
+    <div class="seg" id="seatSeg">
+      <button data-seat="all" class="on">All seats</button>
+      <button data-seat="rev">Rev Management</button>
+      <button data-seat="coo">COO</button>
+      <button data-seat="brand">By brand</button>
+    </div>
+    <div class="seg" id="hzSeg">
+      <button data-hz="all" class="on">All horizons</button>
+      <button data-hz="30">30</button>
+      <button data-hz="60">60</button>
+      <button data-hz="90">90</button>
+    </div>
+    <div class="seg" id="doneSeg">
+      <button data-done="all" class="on">Show all</button>
+      <button data-done="open">Open only</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" onclick="exportJSON()">Export progress</button>
+    <button class="btn" onclick="document.getElementById('imp').click()">Import</button>
+    <input type="file" id="imp" accept=".json" class="hidden" onchange="importJSON(event)">
+    <button class="btn" onclick="window.print()">Print</button>
+    <button class="btn danger" onclick="resetAll()">Reset</button>
+  </div>
+
+  <div class="rollup" id="rollup"></div>
+
+  <div id="seats"></div>
+
+  <div class="seat" id="brandSeat">
+    <h2>Per-brand grid <span class="pct" id="brandPct"></span></h2>
+    <div style="overflow-x:auto">
+      <table id="brandTable">
+        <thead>
+          <tr><th style="width:110px">Brand</th><th>30 days — Aug 12</th><th>60 days — Sep 11</th><th>90 days — Oct 11</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Progress is saved in this browser only (localStorage). Use <b>Export progress</b> to move it between machines, or before replacing this file.
+  &nbsp;·&nbsp; Reports up through the weekly huddle: COO block + Rev Mgmt block. Anything red two weeks running escalates to Riley.
+</footer>
+
+<div class="saved" id="saved">Saved</div>
+
+<script>
+const KEY = 'stayd_306090_v1';
+
+const DATA = {
+  rev: {
+    name: 'Director of Revenue Management',
+    horizons: {
+      30: [
+        { cat:'Data & source of truth', items:[
+          { id:'r30-1', t:'Key Data Enterprise account', n:'Scope, pricing, brand coverage, contract to Aidan.' },
+          { id:'r30-2', t:'Stand up pacing + market-level reports for brands that already have KD access', n:'Turn around this week.' },
+          { id:'r30-3', t:'Publish the KD-access gap list', n:'Which brands are missing, what it costs to close.' },
+          { id:'r30-4', t:'Feed the first pacing/market pack into the OTAmiser conversation', n:'Per-unit guidelines, parameters, minimums. Jarne on all calls.' },
+        ]},
+        { cat:'Channel / enterprise', items:[
+          { id:'r30-5', t:'Tim R meeting — VRBO enterprise account', n:'Support tier, marketing co-op, perks, eligibility. This week.' },
+          { id:'r30-6', t:'VRBO one-pager: what the enterprise account gets us vs. costs us' },
+        ]},
+        { cat:'Fee structure — diagnose only', items:[
+          { id:'r30-7', t:'Resolve the fee markup retention question (JJ / Riley)', b:1, n:'Unblocks the entire fee-breakdown exercise. Put it on this week\u2019s agenda.' },
+          { id:'r30-8', t:'Build the current-state fee stack by brand', n:'Flat rate, %, cleaning, markup, ancillary.' },
+          { id:'r30-9', t:'OTAmiser occupancy-lift baseline', n:'Capture pre-OTAmiser occ/RevPAR by unit so the lift is provable, not projected.' },
+        ]},
+      ],
+      60: [
+        { cat:'Data & source of truth', items:[
+          { id:'r60-1', t:'Key Data enterprise closed; remaining brands onboarded' },
+          { id:'r60-2', t:'Pacing/market reports running weekly for all 8 brands' },
+          { id:'r60-3', t:'Measured OTAmiser occupancy lift published', n:'The evidence that carries the fee conversation.' },
+        ]},
+        { cat:'Fee structure — model & open', items:[
+          { id:'r60-4', t:'Host2Coast — flat rate + % increase modeled', m:'~$300K to 2027' },
+          { id:'r60-5', t:'Big Fish — increase modeled against 30,000+ turns', m:'~$100K to 2027' },
+          { id:'r60-6', t:'Blue Gems — move to a firm %-based structure' },
+          { id:'r60-7', t:'Fee conversations opened with H2C, Big Fish, Blue Gems', n:'Lift first, fee second.' },
+        ]},
+        { cat:'Channel / enterprise', items:[
+          { id:'r60-8', t:'VRBO enterprise perks activated, or decision made' },
+        ]},
+      ],
+      90: [
+        { cat:'2027 goal setting', items:[
+          { id:'r90-1', t:'2027 revenue goals set by brand', n:'RevPAR, ADR, occupancy, take rate.' },
+          { id:'r90-2', t:'2027 revenue goals set by property', n:'Same-store separated from new inventory.' },
+        ]},
+        { cat:'Close out', items:[
+          { id:'r90-3', t:'Fee changes approved, sequenced, owner comms drafted' },
+          { id:'r90-4', t:'Rev mgmt reporting pack folded into the weekly huddle as a standing block' },
+        ]},
+      ],
+    }
+  },
+  coo: {
+    name: 'COO',
+    horizons: {
+      30: [
+        { cat:'Access — the gate', items:[
+          { id:'c30-1', t:'Guesty access + financial access, all 8 brands', b:1, n:'Escalate anything not delivered in 2 weeks.' },
+          { id:'c30-2', t:'First-pass margin scan once access lands', n:'Where is the money leaking — HK vs. maintenance vs. take rate.' },
+        ]},
+        { cat:'Guest journey & upsell', items:[
+          { id:'c30-3', t:'Audit current guest-journey cadence in each brand', n:'What exists, what is ad hoc.' },
+          { id:'c30-4', t:'Draft the STAYD standard journey', n:'Pre-book \u2192 pre-arrival \u2192 in-stay \u2192 post-stay, with upsell touchpoints named.' },
+        ]},
+        { cat:'Conduit / guest messaging', items:[
+          { id:'c30-5', t:'Define the KPI set', n:'Call handling, message handling, response time, recurring issue themes.' },
+          { id:'c30-6', t:'Stand up the training cadence', n:'Use Stephen\u2019s AI + recordings process.' },
+        ]},
+        { cat:'Owner relations / churn', items:[
+          { id:'c30-7', t:'Luke (Renjoy) — pull a churn baseline', n:'Rate + top reasons, by brand. Rough is fine; get the shape.' },
+        ]},
+        { cat:'People', items:[
+          { id:'c30-8', t:'GM placement plan: 30North and Blue Gems', n:'Pipeline, timeline, scorecard.' },
+          { id:'c30-9', t:'Define what "measurable" means for a GM', n:'One page, same for all 8.' },
+        ]},
+      ],
+      60: [
+        { cat:'Guest journey & messaging', items:[
+          { id:'c60-1', t:'Guest journey standard published and implemented', n:'Upsell goal attached.' },
+          { id:'c60-2', t:'Conduit KPIs measured weekly; monthly action-item review with fixes assigned' },
+        ]},
+        { cat:'Financial', items:[
+          { id:'c60-3', t:'Take rate analysis complete', n:'Financials in hand \u2192 goal + named drivers per brand.' },
+        ]},
+        { cat:'Owner relations', items:[
+          { id:'c60-4', t:'Owner Relations playbook v1 from Luke' },
+          { id:'c60-5', t:'Churn attack plan per brand, Luke leading' },
+        ]},
+        { cat:'People & QA', items:[
+          { id:'c60-6', t:'GM placements made (30North, Blue Gems); training underway' },
+          { id:'c60-7', t:'Beachside guest-services training test case \u2192 results + go/no-go on rollout' },
+        ]},
+      ],
+      90: [
+        { cat:'Scale what worked', items:[
+          { id:'c90-1', t:'QA inspection program rolled out beyond Beachside', n:'With tracking + KPIs.' },
+          { id:'c90-2', t:'HK margin and maintenance margin targets set per brand, with an owner' },
+          { id:'c90-3', t:'GM scorecard live for all 8 brands, running through the Founder-GM cadence' },
+          { id:'c90-4', t:'Ops inputs handed to the 2027 goal-setting exercise', n:'Occupancy, upsell, margin, churn.' },
+        ]},
+      ],
+    }
+  }
+};
+
+const BRANDS = [
+  { name:'Beachside VR', d30:'Guest-services training test case launched; QA inspection scoped', d60:'KPI measurement live + weekly action items; QA rollout begins', d90:'Proven template exported to other brands' },
+  { name:'Renjoy', d30:'Financials in hand; Luke starts churn baseline', d60:'GM training; ops margin + take rate expansion plan', d90:'Owner Relations function operating cross-brand' },
+  { name:'30North', d30:'GM placement pipeline', d60:'GM placed and in training', d90:'Brand initiatives migrated to STAYD level' },
+  { name:'Big Fish', d30:'Tech stack integration scoped; 30K+ turns validated', d60:'Integration underway; fee increase modeled (~$100K)', d90:'Fully on STAYD stack; fee change approved' },
+  { name:'Host2Coast', d30:'Org chart mapped; current fee stack documented', d60:'Fee increase modeled (~$300K); margin expansion plan', d90:'Fee change approved; org gaps filled' },
+  { name:'Blue Gems', d30:'GM placement pipeline; %-based fee structure drafted', d60:'GM placed and in training; fee structure firmed', d90:'GM measurable + 2027 goals set' },
+  { name:'Stay Texas', d30:'Financials reviewed; needs assessment', d60:'Integration gaps identified and prioritized', d90:'Deeper STAYD integration executed' },
+  { name:'Haven', d30:'Financial review setup', d60:'GM training underway', d90:'GM measurable + 2027 goals set' },
+];
+
+const DUE = { 30:'Aug 12', 60:'Sep 11', 90:'Oct 11' };
+
+let state = load();
+let filters = { seat:'all', hz:'all', done:'all' };
+
+function load(){
+  try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function save(){
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+    const s = document.getElementById('saved');
+    s.classList.add('show');
+    clearTimeout(window._st);
+    window._st = setTimeout(()=>s.classList.remove('show'), 900);
+  } catch(e){
+    alert('Could not save to this browser. Progress will not persist — use Export progress instead.');
+  }
+}
+
+function allItems(seat){
+  const seats = seat ? [seat] : ['rev','coo'];
+  const out = [];
+  seats.forEach(s=>{
+    Object.keys(DATA[s].horizons).forEach(h=>{
+      DATA[s].horizons[h].forEach(g=>g.items.forEach(i=>out.push({...i, seat:s, hz:h})));
+    });
+  });
+  return out;
+}
+function brandKeys(){
+  const out = [];
+  BRANDS.forEach((b,bi)=>['30','60','90'].forEach(h=>out.push('b'+bi+'-'+h)));
+  return out;
+}
+
+function renderRollup(){
+  const cards = [];
+  ['rev','coo'].forEach(s=>{
+    const items = allItems(s);
+    const done = items.filter(i=>state[i.id]).length;
+    cards.push({ lbl:DATA[s].name, done, total:items.length });
+  });
+  ['30','60','90'].forEach(h=>{
+    const items = allItems().filter(i=>i.hz===h);
+    const bk = brandKeys().filter(k=>k.endsWith('-'+h));
+    const done = items.filter(i=>state[i.id]).length + bk.filter(k=>state[k]).length;
+    cards.push({ lbl:h+' days — '+DUE[h], done, total:items.length + bk.length });
+  });
+  document.getElementById('rollup').innerHTML = cards.map(c=>{
+    const pct = c.total ? Math.round(c.done/c.total*100) : 0;
+    return `<div class="stat ${pct===100?'done':''}">
+      <div class="lbl">${c.lbl}</div>
+      <div class="num">${c.done}<span>/${c.total}</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+    </div>`;
+  }).join('');
+}
+
+function renderSeats(){
+  const host = document.getElementById('seats');
+  const showBrand = filters.seat==='brand';
+  document.getElementById('brandSeat').classList.toggle('hidden', filters.seat!=='all' && !showBrand);
+  host.classList.toggle('hidden', showBrand);
+  if (showBrand) { renderBrands(); return; }
+
+  const seats = filters.seat==='all' ? ['rev','coo'] : [filters.seat];
+  host.innerHTML = seats.map(s=>{
+    const items = allItems(s);
+    const done = items.filter(i=>state[i.id]).length;
+    const hzs = Object.keys(DATA[s].horizons).filter(h=>filters.hz==='all' || filters.hz===h);
+
+    const body = hzs.map(h=>{
+      const groups = DATA[s].horizons[h].map(g=>{
+        const vis = g.items.filter(i=>filters.done==='all' || !state[i.id]);
+        if (!vis.length) return '';
+        return `<div class="cat">${g.cat}</div><ul>` + vis.map(i=>{
+          const ck = !!state[i.id];
+          return `<li class="item ${ck?'checked':''}">
+            <input type="checkbox" ${ck?'checked':''} onchange="toggle('${i.id}',this)">
+            <div class="txt">
+              <div class="t">${i.t}${i.m?`<span class="money">${i.m}</span>`:''}${i.b?`<span class="blocker">BLOCKER</span>`:''}</div>
+              ${i.n?`<div class="n">${i.n}</div>`:''}
+            </div>
+          </li>`;
+        }).join('') + `</ul>`;
+      }).join('');
+      if (!groups.trim()) return '';
+      const hi = DATA[s].horizons[h].flatMap(g=>g.items);
+      const hd = hi.filter(i=>state[i.id]).length;
+      return `<div class="horizon">
+        <div class="hz-head">
+          <h3>${h} days</h3><span class="due">due ${DUE[h]}</span>
+          <span class="cnt">${hd} of ${hi.length} done</span>
+        </div>
+        ${groups}
+      </div>`;
+    }).join('');
+
+    const pct = items.length ? Math.round(done/items.length*100) : 0;
+    return `<div class="seat">
+      <h2>${DATA[s].name}<span class="pct">${done}/${items.length} · ${pct}%</span></h2>
+      ${body || '<div style="padding:20px 18px;color:var(--slate-lt);font-size:13px">Nothing open here. Switch the filter to Show all.</div>'}
+    </div>`;
+  }).join('');
+}
+
+function renderBrands(){
+  const tb = document.querySelector('#brandTable tbody');
+  tb.innerHTML = BRANDS.map((b,bi)=>{
+    const cell = (h,txt)=>{
+      const k = 'b'+bi+'-'+h;
+      const ck = !!state[k];
+      if (filters.hz!=='all' && filters.hz!==h) return `<td style="color:#C8D2DA">—</td>`;
+      if (filters.done==='open' && ck) return `<td style="color:#C8D2DA">—</td>`;
+      return `<td><label class="bcell ${ck?'checked':''}">
+        <input type="checkbox" ${ck?'checked':''} onchange="toggle('${k}',this)">
+        <span>${txt}</span></label></td>`;
+    };
+    return `<tr><td class="brand">${b.name}</td>${cell('30',b.d30)}${cell('60',b.d60)}${cell('90',b.d90)}</tr>`;
+  }).join('');
+  const bk = brandKeys();
+  const d = bk.filter(k=>state[k]).length;
+  document.getElementById('brandPct').textContent = `${d}/${bk.length} · ${Math.round(d/bk.length*100)}%`;
+}
+
+function toggle(id, el){
+  if (el.checked) state[id] = true; else delete state[id];
+  save();
+  render();
+}
+
+function render(){
+  renderRollup();
+  renderSeats();
+  if (filters.seat==='all') renderBrands();
+}
+
+document.querySelectorAll('#seatSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seatSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filters.seat = b.dataset.seat; render();
+});
+document.querySelectorAll('#hzSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#hzSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filters.hz = b.dataset.hz; render();
+});
+document.querySelectorAll('#doneSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#doneSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filters.done = b.dataset.done; render();
+});
+
+function exportJSON(){
+  const blob = new Blob([JSON.stringify({ v:1, saved:new Date().toISOString(), state }, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stayd-306090-progress-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importJSON(e){
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      state = d.state || d;
+      save(); render();
+    } catch(err){ alert('That file could not be read. Import the JSON exported by this page.'); }
+    e.target.value = '';
+  };
+  r.readAsText(f);
+}
+function resetAll(){
+  if (!confirm('Clear every checkbox on this page? Export first if you want a copy.')) return;
+  state = {}; save(); render();
+}
+
+render();
+</script>
+</body>
+</html>

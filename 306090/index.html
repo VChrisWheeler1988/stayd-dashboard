@@ -140,6 +140,28 @@
   .pexit{padding:10px 18px;font-size:13px;background:#F2FAF8;border-bottom:1px solid var(--line);color:var(--teal-dk)}
   .pexit b{text-transform:uppercase;font-size:10.5px;letter-spacing:.8px}
 
+  /* Status + notes */
+  li.item .ctrl{display:flex;gap:6px;margin-top:6px;align-items:center}
+  li.item .ctrl button{border:1px solid var(--line);background:#fff;border-radius:3px;
+    font:inherit;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    padding:2px 8px;cursor:pointer;color:var(--slate)}
+  li.item .ctrl button:hover{border-color:var(--slate-lt)}
+  .st-claim{background:#F2F5F7 !important;color:var(--slate-lt) !important;border-color:var(--line) !important}
+  .st-ver{background:#E6F5F2 !important;color:var(--teal-dk) !important;border-color:#B9E3DC !important}
+  .st-rev{background:#FBF1E3 !important;color:var(--amber) !important;border-color:#EDD5AE !important}
+  .st-drop{background:#FBEDEC !important;color:var(--red) !important;border-color:#E8C4C1 !important}
+  .nb.has{background:#EEF3F6 !important;color:var(--navy-2) !important}
+  .notebox{display:none;margin-top:7px}
+  .notebox.open{display:block}
+  .notebox textarea{width:100%;min-height:58px;resize:vertical;font:inherit;font-size:13px;
+    padding:8px 10px;border:1px solid var(--line);border-radius:4px;color:var(--navy-2);
+    background:#FCFDFE;line-height:1.4}
+  .notebox textarea:focus{outline:none;border-color:var(--teal);background:#fff}
+  li.item.dropped{opacity:.5}
+  li.item.dropped .t{text-decoration:line-through}
+  .stat.unver .num{color:var(--amber)}
+  .stat.unver .bar i{background:var(--amber)}
+
   footer{max-width:1180px;margin:0 auto;padding:0 28px 40px;font-size:12px;color:var(--slate-lt)}
   .saved{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:8px 14px;
     border-radius:var(--radius);font-size:12.5px;opacity:0;transition:opacity .25s;pointer-events:none}
@@ -208,6 +230,12 @@
       <button data-done="all" class="on">Show all</button>
       <button data-done="open">Open only</button>
     </div>
+    <div class="seg" id="evSeg">
+      <button data-ev="all" class="on">Any evidence</button>
+      <button data-ev="claim">Claimed</button>
+      <button data-ev="v">Verified</button>
+      <button data-ev="rd">Revised / dropped</button>
+    </div>
     <div class="spacer"></div>
     <button class="btn" onclick="exportJSON()">Export progress</button>
     <button class="btn" onclick="document.getElementById('imp').click()">Import</button>
@@ -230,10 +258,12 @@
 </main>
 
 <footer>
-  <b>Programs</b> is the plan — seven workstreams drawn from all eight discovery calls. <b>Seats</b> and <b>By brand</b> are the evidence behind it.
-  They share the same items: tick something anywhere and it ticks everywhere.
-  &nbsp;·&nbsp; Progress saves in this browser only (localStorage). <b>Export progress</b> before replacing this file or switching machines.
-  &nbsp;·&nbsp; Reports up through the weekly huddle: COO block + Rev Mgmt block.
+  <b>Programs</b> is the plan. <b>Seats</b> and <b>By brand</b> are the evidence behind it. Same items — tick anywhere, ticks everywhere.
+  <br><br>
+  <b>Nearly everything here is founder self-report, not verified fact.</b> Every item starts as <b>Claimed</b>. As data comes back, cycle it:
+  Claimed → <b>Verified</b> (it holds) → <b>Revised</b> (data said different — write why in the note) → <b>Dropped</b> (no longer applies).
+  Click the status chip to cycle. The <b>Still unverified</b> card shows how much of this plan is still resting on what people told you.
+  &nbsp;·&nbsp; Notes and statuses save with your progress. <b>Export</b> carries all three.
 </footer>
 
 <div class="saved" id="saved">Saved</div>
@@ -849,10 +879,21 @@ const PROGRAMS = [
 ];
 
 let state = load();
-let filters = { seat:'prog', hz:'all', done:'all' };
+let filters = { seat:'prog', hz:'all', done:'all', ev:'all' };
 let activeBrand = '30north';
 
-function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; } }
+function load(){
+  try {
+    const raw = JSON.parse(localStorage.getItem(KEY)) || {};
+    // Migrate the old flat format {id:true} → {done:{}, notes:{}, status:{}}
+    if (!raw.done && !raw.notes && !raw.status) {
+      const done = {};
+      Object.keys(raw).forEach(k=>{ if (raw[k]===true) done[k]=true; });
+      return { done, notes:{}, status:{} };
+    }
+    return { done:raw.done||{}, notes:raw.notes||{}, status:raw.status||{} };
+  } catch(e){ return { done:{}, notes:{}, status:{} }; }
+}
 function save(){
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
@@ -883,30 +924,93 @@ function tags(i){
        + (i.w?`<span class="watch">WATCH</span>`:'')
        + (i.who?`<span class="who">${i.who}</span>`:'');
 }
+const STATUS = {
+  '':  { lbl:'Claimed',  cls:'st-claim', tip:'Founder said it. Not yet verified.' },
+  'v': { lbl:'Verified', cls:'st-ver',   tip:'Checked against data. It holds.' },
+  'r': { lbl:'Revised',  cls:'st-rev',   tip:'Data came back different. See note.' },
+  'd': { lbl:'Dropped',  cls:'st-drop',  tip:'No longer applies. See note.' },
+};
+const CYCLE = ['','v','r','d'];
+
+function cycleStatus(id){
+  const cur = state.status[id] || '';
+  const next = CYCLE[(CYCLE.indexOf(cur)+1) % CYCLE.length];
+  if (next === '') delete state.status[id]; else state.status[id] = next;
+  save(); render();
+}
+function toggleNote(id){
+  const el = document.getElementById('note-'+id);
+  if (!el) return;
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) el.querySelector('textarea').focus();
+}
+function saveNote(id, val){
+  if (val && val.trim()) state.notes[id] = val; else delete state.notes[id];
+  save();
+  const btn = document.getElementById('nb-'+id);
+  if (btn) btn.classList.toggle('has', !!state.notes[id]);
+}
+
 function itemLi(i){
-  const ck = !!state[i.id];
-  return `<li class="item ${ck?'checked':''}">
+  const ck = !!state.done[i.id];
+  const st = state.status[i.id] || '';
+  const s = STATUS[st];
+  const note = state.notes[i.id] || '';
+  const dropped = st === 'd';
+  return `<li class="item ${ck?'checked':''} ${dropped?'dropped':''}">
     <input type="checkbox" ${ck?'checked':''} onchange="toggle('${i.id}')">
-    <div class="txt"><div class="t">${i.t}${tags(i)}</div>${i.n?`<div class="n">${i.n}</div>`:''}</div>
+    <div class="txt">
+      <div class="t">${i.t}${tags(i)}</div>
+      ${i.n?`<div class="n">${i.n}</div>`:''}
+      <div class="ctrl">
+        <button class="st ${s.cls}" title="${s.tip}" onclick="cycleStatus('${i.id}')">${s.lbl}</button>
+        <button class="nb ${note?'has':''}" id="nb-${i.id}" onclick="toggleNote('${i.id}')">
+          ${note ? 'Note ✎' : '+ Note'}
+        </button>
+      </div>
+      <div class="notebox ${note?'open':''}" id="note-${i.id}">
+        <textarea placeholder="What did the data actually say? What changed, and why?"
+          oninput="saveNote('${i.id}', this.value)">${note.replace(/</g,'&lt;')}</textarea>
+      </div>
+    </div>
   </li>`;
+}
+
+
+function evOK(id){
+  const st = state.status[id] || '';
+  if (filters.ev==='all') return true;
+  if (filters.ev==='claim') return st==='';
+  if (filters.ev==='v') return st==='v';
+  if (filters.ev==='rd') return st==='r' || st==='d';
+  return true;
+}
+function visible(i){
+  return (filters.done==='all' || !state.done[i.id]) && evOK(i.id);
 }
 
 function renderRollup(){
   const cards = [];
   ['rev','coo'].forEach(s=>{
     const it = seatItems(s);
-    cards.push({ lbl:DATA[s].name, done:it.filter(i=>state[i.id]).length, total:it.length });
+    cards.push({ lbl:DATA[s].name, done:it.filter(i=>state.done[i.id]).length, total:it.length });
   });
   ['30','60','90'].forEach(h=>{
     const it = [...seatItems(), ...brandItems()].filter(i=>String(i.hz)===h);
-    cards.push({ lbl:h+' days — '+DUE[h], done:it.filter(i=>state[i.id]).length, total:it.length });
+    cards.push({ lbl:h+' days — '+DUE[h], done:it.filter(i=>state.done[i.id]).length, total:it.length });
   });
+  const all = [...seatItems(), ...brandItems()];
+  const unver = all.filter(i=>!(state.status[i.id]||'')).length;
   document.getElementById('rollup').innerHTML = cards.map(c=>{
     const pct = c.total ? Math.round(c.done/c.total*100) : 0;
     return `<div class="stat ${pct===100?'done':''}"><div class="lbl">${c.lbl}</div>
       <div class="num">${c.done}<span>/${c.total}</span></div>
       <div class="bar"><i style="width:${pct}%"></i></div></div>`;
-  }).join('');
+  }).join('') + `<div class="stat unver">
+      <div class="lbl">Still unverified</div>
+      <div class="num">${unver}<span>/${all.length}</span></div>
+      <div class="bar"><i style="width:${Math.round(unver/all.length*100)}%"></i></div>
+    </div>`;
 }
 
 // Flat index of every item by id, so programs can reference them.
@@ -922,12 +1026,12 @@ const IDX = allIndex();
 
 function renderThisWeek(){
   const rows = THIS_WEEK.map(w=>{
-    const ck = !!state[w.id];
+    const ck = !!state.done[w.id];
     return `<li class="${ck?'checked':''}">
       <input type="checkbox" ${ck?'checked':''} onchange="toggle('${w.id}')">
       <div><div class="wt">${w.t}</div><div class="wn">${w.n}</div></div></li>`;
   }).join('');
-  const d = THIS_WEEK.filter(w=>state[w.id]).length;
+  const d = THIS_WEEK.filter(w=>state.done[w.id]).length;
   document.getElementById('thisWeek').innerHTML = `<div class="week">
     <h3>This week</h3>
     <div class="wsub">Six things. Four of them cost a phone call. ${d}/${THIS_WEEK.length} done.</div>
@@ -937,11 +1041,10 @@ function renderThisWeek(){
 function renderPrograms(){
   document.getElementById('programs').innerHTML = PROGRAMS.map(p=>{
     const items = p.items.map(id=>IDX[id]).filter(Boolean);
-    const done = items.filter(i=>state[i.id]).length;
+    const done = items.filter(i=>state.done[i.id]).length;
     const pct = items.length ? Math.round(done/items.length*100) : 0;
     const vis = items.filter(i=>
-      (filters.hz==='all' || String(i.hz)===filters.hz) &&
-      (filters.done==='all' || !state[i.id]));
+      (filters.hz==='all' || String(i.hz)===filters.hz) && visible(i));
     const list = vis.length
       ? `<ul>${vis.map(i=>itemLi(i)).join('')}</ul>`
       : `<div class="empty">Nothing open at this filter.</div>`;
@@ -974,11 +1077,11 @@ function renderSeats(){
   const seats = filters.seat==='all' ? ['rev','coo'] : [filters.seat];
   host.innerHTML = seats.map(s=>{
     const it = seatItems(s);
-    const done = it.filter(i=>state[i.id]).length;
+    const done = it.filter(i=>state.done[i.id]).length;
     const hzs = Object.keys(DATA[s].horizons).filter(h=>filters.hz==='all' || filters.hz===h);
     const body = hzs.map(h=>{
       const groups = DATA[s].horizons[h].map(g=>{
-        const vis = g.items.filter(i=>filters.done==='all' || !state[i.id]);
+        const vis = g.items.filter(visible);
         if (!vis.length) return '';
         return `<div class="cat">${g.cat}</div><ul>${vis.map(itemLi).join('')}</ul>`;
       }).join('');
@@ -986,7 +1089,7 @@ function renderSeats(){
       const hi = DATA[s].horizons[h].flatMap(g=>g.items);
       return `<div class="horizon"><div class="hz-head">
         <h3>${h} days</h3><span class="due">due ${DUE[h]}</span>
-        <span class="cnt">${hi.filter(i=>state[i.id]).length} of ${hi.length} done</span>
+        <span class="cnt">${hi.filter(i=>state.done[i.id]).length} of ${hi.length} done</span>
       </div>${groups}</div>`;
     }).join('');
     const pct = it.length ? Math.round(done/it.length*100) : 0;
@@ -998,14 +1101,14 @@ function renderSeats(){
 function renderBrand(){
   document.getElementById('bnav').innerHTML = BRANDS.map(b=>{
     const it = brandItems(b);
-    const d = it.filter(i=>state[i.id]).length;
+    const d = it.filter(i=>state.done[i.id]).length;
     return `<button class="${b.key===activeBrand?'on':''} ${b.rich?'rich':''}" onclick="pickBrand('${b.key}')">
       <span class="dot"></span>${b.name}<span class="n">${d}/${it.length}</span></button>`;
   }).join('');
 
   const b = BRANDS.find(x=>x.key===activeBrand);
   const it = brandItems(b);
-  const done = it.filter(i=>state[i.id]).length;
+  const done = it.filter(i=>state.done[i.id]).length;
   const pct = it.length ? Math.round(done/it.length*100) : 0;
 
   const sig = b.signals ? `<div class="signals"><h4>Signals from discovery</h4><div class="sgrid">
@@ -1015,11 +1118,11 @@ function renderBrand(){
   const hzs = ['30','60','90'].filter(h=>filters.hz==='all' || filters.hz===h);
   const body = hzs.map(h=>{
     const all = b.horizons[h] || [];
-    const vis = all.filter(i=>filters.done==='all' || !state[i.id]);
+    const vis = all.filter(visible);
     if (!vis.length) return '';
     return `<div class="horizon"><div class="hz-head">
       <h3>${h} days</h3><span class="due">due ${DUE[h]}</span>
-      <span class="cnt">${all.filter(i=>state[i.id]).length} of ${all.length} done</span>
+      <span class="cnt">${all.filter(i=>state.done[i.id]).length} of ${all.length} done</span>
     </div><ul>${vis.map(i=>itemLi({...i,hz:h})).join('')}</ul></div>`;
   }).join('');
 
@@ -1036,7 +1139,7 @@ function renderBrand(){
 }
 
 function pickBrand(k){ activeBrand = k; renderBrand(); }
-function toggle(id){ if (state[id]) delete state[id]; else state[id] = true; save(); render(); }
+function toggle(id){ if (state.done[id]) delete state.done[id]; else state.done[id] = true; save(); render(); }
 function render(){ renderRollup(); renderSeats(); }
 
 document.querySelectorAll('#seatSeg button').forEach(b=>b.onclick=()=>{
@@ -1051,9 +1154,13 @@ document.querySelectorAll('#doneSeg button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#doneSeg button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); filters.done=b.dataset.done; render();
 });
+document.querySelectorAll('#evSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#evSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filters.ev=b.dataset.ev; render();
+});
 
 function exportJSON(){
-  const blob = new Blob([JSON.stringify({ v:2, saved:new Date().toISOString(), state }, null, 2)], {type:'application/json'});
+  const blob = new Blob([JSON.stringify({ v:3, saved:new Date().toISOString(), state }, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'stayd-306090-progress-' + new Date().toISOString().slice(0,10) + '.json';
@@ -1063,7 +1170,7 @@ function importJSON(e){
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = () => {
-    try { const d = JSON.parse(r.result); state = d.state || d; save(); render(); }
+    try { const d = JSON.parse(r.result); const inc = d.state || d; state = { done:inc.done||{}, notes:inc.notes||{}, status:inc.status||{} }; save(); render(); }
     catch(err){ alert('That file could not be read. Import the JSON exported by this page.'); }
     e.target.value = '';
   };
@@ -1071,7 +1178,7 @@ function importJSON(e){
 }
 function resetAll(){
   if (!confirm('Clear every checkbox? Export first if you want a copy.')) return;
-  state = {}; save(); render();
+  state = { done:{}, notes:{}, status:{} }; save(); render();
 }
 
 render();

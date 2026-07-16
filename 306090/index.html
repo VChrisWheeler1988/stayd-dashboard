@@ -162,6 +162,25 @@
   .stat.unver .num{color:var(--amber)}
   .stat.unver .bar i{background:var(--amber)}
 
+  /* GM / Org block */
+  .gmblock{background:#F4F8FB;border-bottom:1px solid var(--line);padding:14px 18px}
+  .gmhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .gmlabel{font-size:10.5px;text-transform:uppercase;letter-spacing:.9px;color:var(--slate);font-weight:700;
+    background:#fff;border:1px solid var(--line);border-radius:3px;padding:2px 7px}
+  .gmname{font-size:14.5px;font-weight:700;color:var(--navy)}
+  .gmstat{margin-left:auto;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+    padding:2px 8px;border-radius:3px}
+  .gm-ok{background:#E6F5F2;color:var(--teal-dk)}
+  .gm-tr{background:#FBF1E3;color:var(--amber)}
+  .gm-fo{background:#EEF2F5;color:var(--slate)}
+  .gm-gap{background:#FBEDEC;color:var(--red)}
+  .gmfocus{margin-top:9px}
+  .gmfl{font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--slate-lt);font-weight:700;margin-bottom:4px}
+  .gmfl em{color:var(--teal-dk);font-style:normal}
+  .gmfocus textarea{width:100%;min-height:60px;resize:vertical;font:inherit;font-size:13px;
+    padding:8px 10px;border:1px solid var(--line);border-radius:4px;color:var(--navy-2);background:#fff;line-height:1.4}
+  .gmfocus textarea:focus{outline:none;border-color:var(--teal)}
+
   footer{max-width:1180px;margin:0 auto;padding:0 28px 40px;font-size:12px;color:var(--slate-lt)}
   .saved{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:8px 14px;
     border-radius:var(--radius);font-size:12.5px;opacity:0;transition:opacity .25s;pointer-events:none}
@@ -210,6 +229,7 @@
     <p style="margin-top:6px;color:var(--red)"><b>And the number that may settle it — Haven: 85% of owners are cash-flow negative.</b> Three brands are losing owners because the asset does not pencil. You cannot raise take rate on owners who are already underwater.</p>
     <p style="margin-top:6px;color:var(--red)"><b>Host2Coast closes the argument.</b> The flagship $300K fee increase targets a brand already at a 45% take rate — the wall Stay Texas hit at 48% and retreated from. But the $300K is sitting in his P&L anyway: housekeeping margin at 13% against a 30% target, a $625K amenity program netting at best $200K, and $175K/yr on inspections Haven proved may be unnecessary. Same money, no owner conversation, no occupancy risk. <b>Model the margin path before the fee path.</b></p>
     <p style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)"><b>Discovery complete — all 8 brands.</b> The original plan was: raise fees at three brands, fix the weak ones, set 2027 goals. The evidence says otherwise. Fees are already at the ceiling where we planned to raise them. A large share of owners are underwater — both the churn driver and the reason fees cannot rise. The money is in <b>margin and ancillary</b>: the damage waiver (4-for-4, does not touch owners), housekeeping margin, amenity execution, inspection spend. And every brand already holds a piece of the answer another brand is missing. <b>The highest-value 90-day deliverable may be the exchange itself, not the goals.</b></p>
+    <p style="margin-top:6px;color:var(--navy-2)"><b>The engine (P8):</b> accounting goes live <b>Aug 1</b>. That unlocks the sequence that actually drives everything — GM KPI cadence → org-chart exercise across all brands on 2025/26 financials → labor as % of topline → cut/keep decisions → founders migrate to STAYD. <b>The 2027 fee increases come out of THIS exercise</b>, combined with the universal take rate — not from the take-rate number on its own. GM readiness ranges from solid (Haven, Stay Texas) to a role gap (Blue Gems has no property manager) to founder-run (Big Fish).</p>
   </div>
 
   <div class="controls">
@@ -277,6 +297,11 @@ const DATA = {
     name: 'Director of Revenue Management',
     horizons: {
       30: [
+        { cat:'Channel coverage — get live everywhere BEFORE optimizing where you are', items:[
+          { id:'r30-23', t:'Audit every brand\u2019s live OTA channels — find the gaps', b:1, w:1, n:'Haven is NOT ON VRBO AT ALL — in the Smokies, one of the most competitive markets in the country, while Big Fish runs $6K → $150–200K on VRBO ads in a comparable market. That is revenue on the floor. Before we spend a cycle optimizing rank or pricing, get every brand live on every channel it should be on. You cannot optimize a listing that does not exist.' },
+          { id:'r30-24', t:'Push Haven live on VRBO now', b:1, m:'25–33x proven', n:'Summer flagged it, Big Fish proved the economics. This is the fastest revenue win in the portfolio and it is a switch that is currently off.' },
+          { id:'r30-25', t:'Then run listing optimization across all brands', n:'Rank work, content, channel completeness. This is where OTAmiser and the pacing reports earn their keep — after coverage, not instead of it.' },
+        ]},
         { cat:'Definition first — everything downstream depends on these two', items:[
           { id:'r30-18', t:'What share of owners are cash-flow NEGATIVE, per brand?', b:1, w:1, n:'Haven says 85%. If that is anywhere near true at Host2Coast or Big Fish, the fee increases are aimed at owners who are already underwater — and the churn we are trying to fix is the churn we would be causing. This single number decides whether the take-rate program is "raise the fee" or "make the owner money." Run it before either fee conversation opens.' },
           { id:'r30-16', t:'Standardize what "take rate" actually means across all 8 brands', b:1, w:1, n:'The numbers now fall into two obvious clusters: 30North ~10% and Big Fish 20% · Host2Coast 45% and Stay Texas 48%. Nobody sits in between. That is not a distribution — that is two different metrics wearing the same word (management commission vs. total capture including fees). Until this is fixed, the portfolio target, the fee models, the margin work and the 2027 goals are all built on sand.' },
@@ -471,6 +496,26 @@ const DATA = {
       ],
     }
   }
+};
+
+// GM roster — seeded from discovery. Focal points are editable on site visits and persist per brand.
+const GM = {
+  '30north':   { name:'Ashley (Joseph Ellen) · Scott (Ancient City)', status:'in-seat', focus:'Both in seat; comp plans live July 1. Scott is ex-Vacasa/LFR. Merge the two under one scorecard; Danny key-man transition is the real work.' },
+  'beachside': { name:'Cookie (ops) · Stephen (revenue/training)', status:'in-seat', focus:'Neither has a defined scope of work — fix that first. Stephen is effectively building the STAYD training function; protect his time.' },
+  'renjoy':    { name:'Ops Director → GM track', status:'transition', focus:'Home-services background, 3–6 month runway to GM. Founders exit operating roles once confirmed. Watch: he runs day-to-day, will NOT drive integration.' },
+  'bigfish':   { name:'Chad (founder-operator)', status:'founder', focus:'Still owner-operated; no GM layer discussed. Highest-volume brand. Succession / GM plan is a gap.' },
+  'host2coast':{ name:'(unclear from discovery)', status:'unknown', focus:'Org structure not mapped. Son does bookkeeping in Topkey; consultants Al/Brad floating. Org-chart exercise lands here first.' },
+  'bluegems':  { name:'No property-manager role exists', status:'gap', focus:'3 ops coordinators dispatch remotely; no local ops layer. Hire the bridge role, not a GM title on the old structure.' },
+  'staytexas': { name:'Wesley (new GM)', status:'in-seat', focus:'Ex-finance controller, one year into STR. External GM hire failed at 90–120 days. Finance depth real, industry depth not yet.' },
+  'haven':     { name:'Summer (GM) · + Director of Ops', status:'in-seat', focus:'Both promoted internally, official July 1. Dylan & Jack already out of day-to-day. Summer\u2019s read: org charts all over the place, no inspections, no owner walks, heavy owner AND employee churn.' },
+};
+
+const GM_STATUS = {
+  'in-seat':    { lbl:'GM in seat',   cls:'gm-ok' },
+  'transition': { lbl:'In transition',cls:'gm-tr' },
+  'founder':    { lbl:'Founder-run',  cls:'gm-fo' },
+  'gap':        { lbl:'Role gap',     cls:'gm-gap' },
+  'unknown':    { lbl:'Unmapped',     cls:'gm-gap' },
 };
 
 const BRANDS = [
@@ -784,6 +829,9 @@ const BRANDS = [
       { k:'Cleaning co.', v:'Separate company, own GM, ~$200K profit' },
       { k:'Maintenance', v:'LOSING money · fighting to reach break-even', warn:true },
       { k:'Direct bookings', v:'"What are those" — essentially none', warn:true },
+      { k:'NOT on VRBO', v:'Entirely absent from the channel in the Smokies', warn:true },
+      { k:'Employee churn', v:'Heavy — Summer flags it alongside owner churn', warn:true },
+      { k:'Org charts', v:'"All over the place" — Summer, unprompted', warn:true },
       { k:'Sales', v:'Best in the group. Daily role-play. Jack built it.' },
       { k:'Weakness', v:'Service recovery — solve the problem, guest still unhappy', warn:true },
       { k:'Growth', v:'200 → 280 properties with no net new hires' },
@@ -792,6 +840,10 @@ const BRANDS = [
     horizons:{
       30:[
         { id:'b-hvn-1', t:'Get the 85% number verified and replicated', b:1, w:1, n:'If 85% of Haven\u2019s owners are cash-flow negative, run the same cut at Host2Coast and Big Fish BEFORE the fee conversations open. This is the highest-leverage number in the portfolio.' },
+        { id:'b-hvn-16', t:'Push Haven live on VRBO', b:1, w:1, m:'proven 25–33x', n:'They are entirely absent from VRBO in the Smokies. Big Fish proved the ad economics in a comparable market. Fastest revenue switch in the portfolio and it is currently off. Summer flagged it.' },
+        { id:'b-hvn-17', t:'Summer\u2019s org-chart read: map the hierarchy', b:1, n:'Her words — the hierarchies and org charts are all over the place. She is the GM and she is naming the exact problem the org-chart program exists to fix. Start the labor-vs-topline exercise here with her.' },
+        { id:'b-hvn-18', t:'Two churns, not one: owner AND employee', w:1, n:'Summer flags heavy owner churn AND heavy employee churn. Employee churn is upstream of everything — Beachside is cycling agents too. Feed both into the retention work.' },
+        { id:'b-hvn-19', t:'Summer\u2019s retention thesis: make it emotional, not financial', n:'Owners do not know their costs or the market, and they are heavy Airbnb. Her instinct: the retention play is emotional, not a spreadsheet. Pair with the owner onboarding revenue sheet — arm them with the numbers first, then the relationship.' },
         { id:'b-hvn-4', t:'Document the QA counter-experiment properly', b:1, n:'They removed dedicated inspections and scores held. Cleaners mini-inspect; maintenance and runners inspect while on site; the cleaning company has its own inspectors going behind cleaners. Get the real mechanism written down before Beachside and Blue Gems spend money on a different one.' },
         { id:'b-hvn-5', t:'Extract the damage waiver + damage fee structure', m:'$70–90K/mo', n:'Two layers, not one. Note the flaw to fix on export: theirs is opt-out and owners opted out. Big Fish proves mandatory works.' },
         { id:'b-hvn-6', t:'Jack documents the Haven sales process', who:'Jack', n:'He is the CRO. This is his own asset and it is not written down.' },
@@ -852,7 +904,7 @@ const PROGRAMS = [
     n:'P4', key:'margin', kind:'gate', title:'Margin Repair — this replaces the fee increases',
     owner:'Chris · Aidan', window:'60–90 days',
     why:'The original plan was to raise fees at Host2Coast, Big Fish and Blue Gems. Discovery says that is aimed at the wrong lever. <b>Host2Coast is already at a 45% take rate</b> — the wall Stay Texas hit at 48% and retreated from. But his $300K exists anyway, in his own P&L: <b>housekeeping margin at 13% against a 30% target</b>, a <b>$625K amenity program netting "at best $200K"</b>, and <b>$175K/yr on inspections</b> Haven proved may be unnecessary. Same money. No owner conversation, no occupancy risk, no churn risk. Big Fish is worse: his $100K would tax the 20%-vs-40% commission pitch that drives his entire acquisition engine.',
-    exit:'Margin targets per brand with a named owner. The fee increases proceed only if they beat the margin path on merit.',
+    exit:'Margin targets per brand with a named owner. The fee increases proceed only if they beat the margin path on merit — and only once the org-chart / labor benchmarking (P8) says where they are warranted.',
     items:['r60-4','r60-22','c30-36','c30-37','b-h2c-2','b-h2c-9','b-h2c-5','r60-5','b-bgf-4','c30-47','c30-27','c30-35','b-bsd-4','r60-20','r60-21','b-rnj-8','c30-29','b-rnj-9','c60-3'],
   },
   {
@@ -875,6 +927,14 @@ const PROGRAMS = [
     why:'Matt at Stay Texas migrated PMS, onboarded Breezeway and rebranded <b>in a single 90-day sprint</b>. It cost him software failure after software failure, his focus on guests and owners, and <b>Airbnb Superhost status for the first time since 2013</b>. His explicit concern about the holdco is too many launches at once. <b>We are currently planning Guesty, OTAmiser, Conduit, Key Data, NetSuite, guest journey, QA and comp plans — across eight brands.</b> Host2Coast is nervous about Conduit while drowning in accounting uncertainty. Blue Gems does not know what STAYD is. Riley wants guest services centralised in six months, which cannot happen until policies are standardised — a prerequisite currently owned by nobody.',
     exit:'Every brand knows what is landing, when, and it is never more than two things at once.',
     items:['c30-13','c30-14','c30-46','c30-20','c30-21','b-h2c-1','b-h2c-8','b-stx-7','c30-41','c30-32','c30-40','c30-24','b-bsd-5','b-bsd-6'],
+  },
+  {
+    n:'P8', key:'gm', kind:'', title:'GMs & Org Charts — the COO engine',
+    owner:'Chris (leads) → GMs',
+    window:'Aug 1 accounting → 90 days',
+    why:'This is the program that powers the others. The sequence is a chain: <b>accounting goes live Aug 1</b> → GMs run a real KPI + financial review cadence → using 2025 and 2026-YTD financials, run the <b>org-chart exercise with all brands present</b>, benchmarking <b>labor as a % of topline</b> → decide who to cut and who is instrumental → migrate founders out of operating roles and onto STAYD. Summer named the problem unprompted: the hierarchies and org charts are all over the place. GM status today ranges from solid (Haven\u2019s Summer, Stay Texas\u2019 Wesley) to a straight role gap (Blue Gems has no property manager at all) to founder-run (Big Fish). And critically — <b>this exercise is what the fee increases come out of.</b> The universal take rate plus labor benchmarking is how you identify defensible 2027 fee moves, not the take-rate number alone.',
+    exit:'Every brand has a GM in seat with a scorecard, an org chart benchmarked against labor %, founders migrated to STAYD, and a clean read on where fee increases are actually warranted for 2027.',
+    items:['c60-6','c90-3','c30-9','c30-11','b-blg-1','b-rnj-4','b-rnj-13','b-hvn-3','b-hvn-17','b-bsd-5','b-h2c-12','b-30n-12','r90-1','r90-2'],
   },
 ];
 
@@ -1115,6 +1175,24 @@ function renderBrand(){
     ${b.signals.map(s=>`<div class="sig ${s.warn?'warn':''}"><div class="k">${s.k}</div><div class="v">${s.v}</div></div>`).join('')}
   </div></div>` : '';
 
+  const g = GM[b.key];
+  const gs = g ? GM_STATUS[g.status] : null;
+  const gmKey = 'gm-focus-'+b.key;
+  const savedFocus = state.notes[gmKey];
+  const focusText = (savedFocus !== undefined ? savedFocus : (g ? g.focus : ''));
+  const gm = g ? `<div class="gmblock">
+    <div class="gmhead">
+      <span class="gmlabel">GM / Org</span>
+      <span class="gmname">${g.name}</span>
+      <span class="gmstat ${gs.cls}">${gs.lbl}</span>
+    </div>
+    <div class="gmfocus">
+      <div class="gmfl">Focal points ${savedFocus!==undefined?'<em>· edited</em>':''}</div>
+      <textarea placeholder="Update after your site visit — who\u2019s in place, who\u2019s instrumental, who to cut, org-chart gaps, labor % vs. topline."
+        oninput="saveNote('${gmKey}', this.value)">${focusText.replace(/</g,'&lt;')}</textarea>
+    </div>
+  </div>` : '';
+
   const hzs = ['30','60','90'].filter(h=>filters.hz==='all' || filters.hz===h);
   const body = hzs.map(h=>{
     const all = b.horizons[h] || [];
@@ -1132,6 +1210,7 @@ function renderBrand(){
   document.getElementById('brandPanel').innerHTML = `<div class="seat">
     <h2>${b.name}<span class="pct">${done}/${it.length} · ${pct}%</span></h2>
     ${b.note?`<div style="padding:13px 18px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--slate)">${b.note}</div>`:''}
+    ${gm}
     ${sig}
     ${body || '<div class="empty">Nothing open here. Switch to Show all.</div>'}
     ${stub}
